@@ -1,0 +1,14 @@
+
+*.pyc
+
+.idea/.name
+
+*.iml
+
+*.xml
+
+*.md
+
+models-master/.gitmodules
+
+models-master/AUTHORS

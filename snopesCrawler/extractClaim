@@ -1,0 +1,12 @@
+import path
+import json
+with open( path.datapath+'jounral.txt', encoding='utf-8', mode='r') as Seenlist:
+    i=0
+
+    for line in Seenlist:
+        datajson2=json.loads(line)
+        if datajson2['Label'] =='FACT CHECK' and datajson2["Result"]=="FALSE":
+            i=i+1
+            with open( path.datapath+'Claim3.txt', encoding='utf-8', mode='a') as Seenlist2:
+                            Seenlist2.write(datajson2["Claim"] +"\n")
+    print (i)

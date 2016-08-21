@@ -193,7 +193,7 @@ class TwitterSearchImpl(TwitterSearch):
         super(TwitterSearchImpl, self).__init__(projectname,rate_delay, error_delay)
         self.max_tweets = max_tweets
         self.counter = 0
-        self.projeckDir=path.datapath+'webpagefortwitter/'+self.projectname+'/'
+        self.projeckDir=path.TweetRAWpath+'News/'+self.projectname+'/'
     def count_tweets(self, tweets):
         return len(tweets)
     def save_tweets(self, tweets):
@@ -231,24 +231,25 @@ class TwitterSearchImpl(TwitterSearch):
 
 if __name__ == '__main__':
     checkedlist=list()
-    with open(  path.datapath+"checkedRumorsLIST.txt", mode='r') as Seenlist2:
+    with open(  path.datapath+"checkedNewsLIST.txt", mode='r') as Seenlist2:
         for sentence in   Seenlist2:
             checkedlist.append(sentence.replace('\n',''))
 
-    with open(  path.datapath+"checkedRumorsLIST.txt", mode='a') as Seenlist2:
-        with open(  path.datapath+"RumorsLIST.txt", mode='r') as Seenlist:
-            for sentence in Seenlist:
-                checkedtitle=sentence.split("@,@")[1].replace('\n','')
-                if(checkedtitle not in checkedlist):
-                    twit = TwitterSearchImpl(checkedtitle,1, 5, 1500000)
-                    twit.search(sentence.split("@,@")[0])
-                    checkedlist.append(checkedtitle)
+    with open(  path.datapath+"NewsLIST.txt",encoding="utf-8", mode='r') as Seenlist:
+        for sentence in Seenlist:
+            checkedtitle=sentence.split("@,@")[1].replace('\n','')
+            if(checkedtitle not in checkedlist):
+                twit = TwitterSearchImpl(checkedtitle,1, 5, 1500000)
+                twit.search(sentence.split("@,@")[0])
+                checkedlist.append(checkedtitle)
+                with open(  path.datapath+"checkedNewsLIST.txt", mode='a') as Seenlist2:
                     Seenlist2.write(checkedtitle+'\n')
-
+    #twit = TwitterSearchImpl("Ammon_Bundy_Rosa_Parks",1, 5, 1500000)
     #twit.search("Huggies AND（Glass OR glasses OR fiberglass) AND (Wipes OR wipe) ")
     #twit.search("(Olive Garden) ( Planned Parenthood)  ")
     #twit.search("(recharge OR charge OR charging) (microwave OR microwaving OR \"microwave oven\") (phone OR phones OR iphone) ")
     #twit.search("twitter summize   (buy OR buys OR bought OR Purchase)")
     #twit.search("(wax OR waxed OR waxing OR youtu.be/X2K1WSqlP4o  ) (apple OR apples) (cancer) ")
     #twit.search("(banana OR bananas) (HIV OR  AIDS)   (infected OR Infected ) ")
+    #twit.search("(Ammon Bundy) ( Rosa Parks)")
 

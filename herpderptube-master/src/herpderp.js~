@@ -1,0 +1,32 @@
+function randomDerp()
+{
+    this.derpOriginal = $(this).html();
+
+    $(this).click(function() {
+	$(this).html(this.derpOriginal);
+	$(this).removeClass("derped");
+    });
+
+    var randomLength = (Math.floor(Math.random() * 20) + 1);
+    var wordArray = new Array();
+    var x;
+
+    for (x = 0; x < randomLength; x++)
+    {
+	randomBit = (Math.floor(Math.random() * 2));
+	wordArray[x] = (randomBit === 1 ? "herp" : "derp");
+    }
+
+    // add derped class
+    $(this).addClass("derped");
+
+    return '<span>' + wordArray.join(' ') + '</span>';
+}
+
+// only select un-derped elements
+$('div .Ct').not('.derped').html(randomDerp);
+
+setInterval(function() {
+    // only select un-derped elements
+    $('div .Ct').not('.derped').html(randomDerp);
+}, 250);

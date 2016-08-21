@@ -12,7 +12,9 @@ client = MyClient("V0dszSPR1da4exOnePoPV2spF",
         "rcg7EChRmeFemrChegWqy8jRt3tieMwHGCzvXGCd9DMk9")
 
 
-output = client.api.search.tweets.get(q = '((apple OR apples ) AND cancer)  (Caused OR Cause OR Causes OR wax OR waxed)',count ='1000',f='tweets')
-#output = client.api.search.tweets.get(q = 'apple')
-print output
-print output.data
+output = client.api.search.tweets.get(q = '(obama OR USA) appreciation month  (-Military -Jazz)',count=100,until='2013-09-28')
+#output = client.api.statuses.retweeters.ids.get(id = '746783589312888832')
+for tweet in  output.data['statuses']:
+    print(tweet)
+#print(len(output.data ))
+print(len(output.data['statuses']))

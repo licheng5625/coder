@@ -1,0 +1,4 @@
+Traceback (most recent call last):
+  File "/Applications/PyCharm.app/Contents/helpers/pydev/pydevd_comm.py", line 356, in OnRun
+    self.processCommand(cmd_id, int(args[1]), args[2])
+error: [Errno 9] Bad file descriptor

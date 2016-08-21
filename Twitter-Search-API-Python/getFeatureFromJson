@@ -1,0 +1,42 @@
+import path
+import json
+import datetime
+
+
+def getHours(time1,time2):
+   return int((time2-time1).days*24+(time2-time1).seconds/3600)
+
+featurefile=path.TweetJSONpath+'featuresRumors.txt'
+descriptionfile=path.TweetJSONpath+'descriptionRumors.txt'
+
+eventsdescriptionlist={}
+with open(descriptionfile,encoding='utf-8',mode='r') as reader:
+        for line in reader:
+            data=json.loads(line)
+            eventsdescriptionlist[data['eventID']]=data
+
+
+
+eventlist=dict()
+with open(featurefile,encoding='utf-8',mode='r') as reader:
+    for line in reader:
+        data=json.loads(line)
+        #if data['eventID'] in eventlist.keys():
+            #eventlist[data['eventID'] ].append(data['data'])
+        #else:
+        #print(str(data['eventID'])+'    '+str(len(data['data'])))
+
+        eventlist[data['eventID'] ]=data['data']
+
+
+
+for eventID in eventlist.keys():
+    enddate=datetime.datetime.strptime(eventsdescriptionlist[eventID]['endDate'],"%Y-%m-%d-%H")
+    begindate=datetime.datetime.strptime(eventsdescriptionlist[eventID]['begindenDate'],"%Y-%m-%d-%H")
+
+    duration = getHours(begindate,enddate)
+    Tweetslist=[[] for n in range(duration)]
+    for tweet in eventlist[eventID]:
+        print(tweet)
+        Tweetslist[tweet['time']].append(tweet['features'])
+    #print(Tweetslist)

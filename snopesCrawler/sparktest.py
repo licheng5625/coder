@@ -1,5 +1,4 @@
 import findspark
-import path
 findspark.init(spark_home='/Applications/spark-1.6.1')
 
 from pyspark import SparkContext, SparkConf
@@ -40,19 +39,37 @@ def creattuple2(v1,keyword):
         wordcountnum(word=keyw[0],num=keyw[1],key=keyword)
         dddd.append(wordcountnum)
     return dddd
-dict2={"apple3": 2, "apples pie": 7, "car": 2, "apple": 4, "storm": 3}
-dict3=["apple","car","storm"]
-map3 =sc.textFile(path.datapath+'test.txt').flatMap(lambda line:(line.split(" "))).distinct()
-print (map3.collect())
-map1 =sc.parallelize(dict2).map(lambda v1:(v1,dict2[v1]))
+def creattuple3(v1,v2):
+    if v2[0] is not None:
+        return (v1[0]+v2[0])
 
-map2 = sc.parallelize(dict3)
-map2=map2.cartesian(map1).filter(lambda v1:v1[0] in v1[1][0])
-print(map2.collect())
-map2=map2.reduceByKey(lambda v1,v2:merge(v1,v2)).map(lambda v1:(v1[0],v1[1][1]))
-print(map2.collect())
+    print("www")
+    return v1[0]
+dict2=[1,2,3,4,5]
+dict4=['q','w','r']
+#dict3=["apple","car","storm"]
+#map3 =sc.textFile(path.datapath+'test.txt').flatMap(lambda line:(line.split(" "))).distinct()
+#print (map3.collect())
+def addfrombefore(datalist):
+    datalist=list(datalist)
+    for i in range(len(datalist)):
+        for j in range(i):
+            datalist[i][1]+=datalist[j][1]
+    return datalist
+map1 =sc.parallelize(dict2)#.map(lambda v1:[v1[0],v1[1]]).reduceByKey(lambda v1,v2:v1+v2)#.map(lambda v1:[v1[0],v1[1]])
+map2 =sc.parallelize(dict4).cartesian(map1)
+print ((map2.collect()))
 
-rddput = sc.parallelize(dict2).map(lambda v1:(v1,dict2[v1])).filter(lambda v1:"apple" in v1[0]).map(lambda v1: v1[1]).sum()
+
+
+
+#map2 = sc.parallelize(dict3)
+#map2=map2.cartesian(map1).filter(lambda v1:v1[0] in v1[1][0])
+#print(map2.collect())
+#map2=map2.reduceByKey(lambda v1,v2:merge(v1,v2)).map(lambda v1:(v1[0],v1[1][1]))
+#print(map2.collect())
+
+#rddput = sc.parallelize(dict2).map(lambda v1:(v1,dict2[v1])).filter(lambda v1:"apple" in v1[0]).map(lambda v1: v1[1]).sum()
 #rddput= 13 it works fine for one word 'apple'
 
 #rdd1 = sc.parallelize(dict2).map(lambda v1:(v1,dict2[v1]))

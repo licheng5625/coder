@@ -42,7 +42,7 @@ sc = SparkContext(conf=conf)
 
 
 
-map3 =sc.textFile('/Users/licheng5625/PythonCode/masterarbeit/data/webpagefortwitter/charge microwave/charge microwave.txt').map(lambda line:(line.split("   ")[0][:7],1)).filter(lambda v1:len(v1[0])==7 and v1[0][:2]=="20").reduceByKey(lambda v1,v2:v1+v2).sortByKey(True,1)
+map3 =sc.textFile('/Users/licheng5625/PythonCode/masterarbeit/data/webpagefortwitter/Thailand_Snake_Girl.txt').map(lambda line:(line.split("   ")[0][:7],1)).filter(lambda v1:len(v1[0])==7 and v1[0][:2]=="20").reduceByKey(lambda v1,v2:v1+v2).sortByKey(True,1)
 dates=map3.map(lambda v1:datetime.datetime.strptime(v1[0],"%Y-%m")).collect()
 times=map3.map(lambda v1:v1[1]).collect()
 years = mdates.YearLocator()   # every year

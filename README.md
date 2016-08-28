@@ -6,3 +6,5 @@ snopesCrawler	: crwal in snopes
 
 
 ML : get fearutre from tweet and train the ML models.
+
+data.zip

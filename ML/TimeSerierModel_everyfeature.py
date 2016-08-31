@@ -75,7 +75,7 @@ def getFeauture(tweet,maxtime,indexfeatureslist):
 
 
 
- 
+
 for feature in featuresdecription.Allfeaturefull:
     result=[]
     # 1---48 hors

@@ -12,3 +12,15 @@
 models-master/.gitmodules
 
 models-master/AUTHORS
+
+models-master/.DS_Store
+
+models-master/syntaxnet/.DS_Store
+
+RAKE-tutorial/.DS_Store
+
+snopesCrawler/.DS_Store
+
+snopesCrawler/bs4/.DS_Store
+
+.DS_Store

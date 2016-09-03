@@ -2,10 +2,10 @@ import path
 import json
 import os
 
-outputFile=path.Featurepath+'featuresRumorsTimeSeriorCreditMerged.txt'
-inputFile=path.Featurepath+'featuresRumorsTimeSerior.txt'
-mergeFile=path.Featurepath+'featuresRumorsTimeSeriorCredit.txt'
-mergefeatures=['creditScore']
+outputFile=path.Featurepath+'featuresNewsTimeSeriorCreditMerged.txt'
+inputFile=path.Featurepath+'featuresNewsTimeSerior.txt'
+mergeFile=path.Featurepath+'featuresNewsTimeSeriorCredit.txt'
+mergefeatures=['UrlRankIn5000']
 
 
 

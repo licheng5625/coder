@@ -3,6 +3,8 @@ import numpy
 import json
 import random
 from sklearn import datasets, metrics,cross_validation
+import csv
+
 listofrumor=list()
 listofnews=list()
 import  path
@@ -25,7 +27,7 @@ with open(path.Featurepath+'featuresNewsTimeSerior.txt', mode='r') as writer:
 
 def random_forest_classifier(train_x, train_y):
     from sklearn.ensemble import RandomForestClassifier
-    model = RandomForestClassifier(n_estimators=8)
+    model = RandomForestClassifier(n_estimators=8,random_state=0)
     model.fit(train_x, train_y)
     return model
 
@@ -73,13 +75,18 @@ def getFeauture(tweet,maxtime,indexfeatureslist):
         #allfeaturelist=stats.zscore(numpy.array(allfeaturelist)).tolist()
     return allfeaturelist
 
+indeslixt=[]
+for i in range(len(listofrumor)+len(listofnews)):
+    indeslixt.append(i)
+    i+=1
+random.seed(0)
+random.shuffle(indeslixt)
+allresult=[{} for x in range(49)]
+for maxtime in range(48,49):
 
-
-
-for feature in featuresdecription.Allfeaturefull:
-    result=[]
+    result={}
+    for feature in featuresdecription.Allfeaturefull:
     # 1---48 hors
-    for maxtime in range(1,49):
         listofPara=list()
         listofresult=list()
 
@@ -94,95 +101,54 @@ for feature in featuresdecription.Allfeaturefull:
             listofresult.append(-1)
 
 
-        def getscore2(listofPara,listofresult):
-            scores=[]
-            indeslixt=[]
-            for i in range(len(listofPara)):
-                    indeslixt.append(i)
-                    i+=1
-            random.seed()
-            random.shuffle(indeslixt)
-            templistofpara=[]
-            templistofresult=[]
-            templistoftestpara=[]
-            templistoftestresult=[]
-            #print(indeslixt[:5])
-            for eeee in range(len(listofPara)):
-                for eee in range(len(listofPara)):
-                    if eee != indeslixt[eeee]:
-                        templistofpara.append(listofPara[eee])
-                        templistofresult.append(listofresult[eee])
-                    else:
-                        templistoftestpara.append(listofPara[eee])
-                        templistoftestresult.append(listofresult[eee])
-                clf = svm.SVC()
-                clf.fit(templistofpara, templistofresult)
-                score = metrics.accuracy_score(clf.predict((templistoftestpara)), (templistoftestresult))
-                scores.append(score)
-                clf=None
-            return scores
-
         def getscore(times,listofPara,listofresult):
             scores=[]
             scaler = StandardScaler()
             scaler.fit(listofPara)
             listofPara = scaler.transform(listofPara)
-            #templistoftestpara = scaler.transform(templistoftestpara)
 
             for time in range(times):
-                indeslixt=[]
-                for i in range(len(listofPara)):
-                    indeslixt.append(i)
-                    i+=1
-                random.seed(time)
-
-                random.shuffle(indeslixt)
                 templistofpara=[]
                 templistofresult=[]
                 templistoftestpara=[]
                 templistoftestresult=[]
                 #print((indeslixt))
                 for eee in range(len(listofPara)):
-                    if eee in indeslixt[0:80]:
+                    if eee not in  indeslixt[time*int(len(listofPara)/times):time*int(len(listofPara)/times)+int(len(listofPara)/times)]:
                         templistofpara.append(listofPara[eee])
                         templistofresult.append(listofresult[eee])
                     else:
                         templistoftestpara.append(listofPara[eee])
                         templistoftestresult.append(listofresult[eee])
-                #clf = SVM_classifier(templistofpara, templistofresult)
-                #clf=MLP_classifier(templistofpara, templistofresult)
                 clf=random_forest_classifier(templistofpara, templistofresult)
-                #clf.fit(templistofpara, templistofresult)
                 score = metrics.accuracy_score(clf.predict(templistoftestpara), (templistoftestresult))
                 scores.append(score)
-            # importances = clf.feature_importances_
-            # std = numpy.std([tree.feature_importances_ for tree in clf.estimators_],
-            #              axis=0)
-            # indices = numpy.argsort(importances)[::-1]
-            # print("Feature ranking:")
-            # global featuresIndes
-            # for f in range(len(templistofpara[1])):
-            #     print("%d. feature %s (%f)" % (f + 1, featuresIndes[f], importances[indices[f]]))
 
             return scores
-        #
-        #print( clf.predict(listofParatest))
-        #print(clf.predict((listofParatest)))
-        #clf = svm.SVC(C=1)
-        #clf=random_forest_classifier
-        # scaler = StandardScaler()
-        # scaler.fit(listofPara)
-        # listofPara = scaler.transform(listofPara)
-        # scores = cross_validation.cross_val_score( clf, listofPara, listofresult, cv=9)
-        # print(sum(scores) / float(len(scores)))
 
 
 
-        scores=getscore(20,listofPara,listofresult)
+        scores=getscore(10,listofPara,listofresult)
         avg=sum(scores) / float(len(scores))
-        result.append(avg)
-    avg=sum(result) / float(len(result))
-    print(feature +'    '+str(avg))
+        result[feature]=avg
+    sortkeys=sorted(result, key=result.__getitem__,reverse=True)
+    i=0
+    for key in sortkeys:
+        allresult[maxtime][key]=i
+        i+=1
+        print('\''+key+'\'',)
+
+with open(path.Featurepath+"rankedfeatures2.csv",encoding='utf-8', mode='w') as csvfile:
+    writermix = csv.DictWriter(csvfile, fieldnames=['time']+featuresdecription.Allfeaturefull)
+    writermix.writeheader()
+
+    for time in range(1,49):
+        rankedfeature=allresult[time]
+        rankedfeature['time']=time
+        writermix.writerow(rankedfeature)
+
+    #avg=sum(result) / float(len(result))
+    #print(feature +'    '+str(avg))
     #print('  '+str(maxtime)+'    '+str(avg))
 
   # 1    0.721875

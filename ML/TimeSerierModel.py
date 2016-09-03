@@ -25,7 +25,7 @@ with open(path.Featurepath+'featuresNewsTimeSerior.txt', mode='r') as writer:
 
 def random_forest_classifier(train_x, train_y):
     from sklearn.ensemble import RandomForestClassifier
-    model = RandomForestClassifier(n_estimators=8)
+    model = RandomForestClassifier(n_estimators=10,random_state=1)
     model.fit(train_x, train_y)
     return model
 
@@ -33,16 +33,16 @@ def random_forest_classifier(train_x, train_y):
 def MLP_classifier(train_x, train_y):
     clf = MLPClassifier(activation='relu', algorithm='adam', alpha=0.001,
                batch_size='auto', beta_1=0.9, beta_2=0.999, early_stopping=False,
-               epsilon=1e-08, hidden_layer_sizes=([5,5]), learning_rate='constant',
-               learning_rate_init=0.01, max_iter=500, momentum=0.9,
-               nesterovs_momentum=True, power_t=0.5, random_state=1, shuffle=True,
-               tol=0.0001, validation_fraction=0.1, verbose=False,
+               epsilon=1e-08, hidden_layer_sizes=([20,20]), learning_rate='constant',
+               learning_rate_init=0.01, max_iter=300, momentum=0.9,
+               nesterovs_momentum=True, power_t=0.5, random_state=0, shuffle=True,
+                validation_fraction=0.1, verbose=False,
                warm_start=False)
     clf.fit(train_x, train_y)
     return clf
 
 def SVM_classifier(train_x, train_y):
-    clf = svm.SVC(C=1)
+    clf = svm.SVC(C=3.5,random_state=0)
     clf.fit(train_x, train_y)
     return clf
 featuresIndes=[]
@@ -79,10 +79,11 @@ for i in range(len(listofrumor)+len(listofnews)):
     i+=1
 random.seed(0)
 random.shuffle(indeslixt)
+#print(indeslixt[:5])
 
+pickedFeatures=featuresdecription.Allfeaturefull
 
-
-for maxtime in range(1,48):
+for maxtime in range(48,49):
 
     listofPara=list()
     listofresult=list()
@@ -91,10 +92,10 @@ for maxtime in range(1,48):
     listofresulttest=list()
     #for feature in featuresdecription.Allfeaturefull:
     for rumor in listofrumor:
-        listofPara.append(getFeauture(rumor,maxtime,featuresdecription.Tweetfeaturesingle))
+        listofPara.append(getFeauture(rumor,maxtime,pickedFeatures))
         listofresult.append(1)
     for news in listofnews:
-        listofPara.append(getFeauture(news,maxtime,featuresdecription.Tweetfeaturesingle))
+        listofPara.append(getFeauture(news,maxtime,pickedFeatures))
         listofresult.append(-1)
 
 
@@ -114,7 +115,7 @@ for maxtime in range(1,48):
             templistoftestresult=[]
             #print((indeslixt))
             for eee in range(len(listofPara)):
-                if eee not in indeslixt[time*time:time*time+int(len(listofPara)/times)]:
+                if eee not in  indeslixt[time*int(len(listofPara)/times):time*int(len(listofPara)/times)+int(len(listofPara)/times)]:
                     templistofpara.append(listofPara[eee])
                     templistofresult.append(listofresult[eee])
                 else:

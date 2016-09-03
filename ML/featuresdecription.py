@@ -23,7 +23,7 @@ Textfeaturesingle_old=['lenthofTweet','NumPositiveWords','PositiveScoer',
 
 Tweetfeaturesingle=['Hashtag','Menstion','numUrls','Retweets','Isretweet',
                     'NumPhotos','Favorites','ContainNEWS',
-                    'Contain_videos','WotScore','UrlRank']
+                    'Contain_videos','WotScore','UrlRankIn5000','UrlRank']
 
 
 Tweetfeaturesingle_Old=['Hashtag','Menstion','numUrls','Retweets','Isretweet',
@@ -38,10 +38,28 @@ Allfeaturesingle=Userfeaturesingle+Textfeaturesingle+Tweetfeaturesingle
 
 Allfeaturefull=Textfeaturesingle+Userfeaturefull+fullfeatureonly+Tweetfeaturesingle+['creditScore']
 AllfeaturefullOld=Userfeaturesingle+Textfeaturesingle_old+Tweetfeaturesingle_Old#+['creditScore']
-
-pickfeature=['lenthofTweet','NumChar','Capital','Smile','Sad','NumPositiveWords','NumNegativeWords','PositiveScoer'
-             ,'I','You','HeShe','Userfriends_count','Userfollowers_count','QuestionExclamation','Exclamation'
-            ,'Question','Stock','Via' ]#['WotScore']#+Userfeaturesingle+Textfeaturesingle_old+['Hashtag','Menstion','numUrls','Retweets','Isretweet','NumPhotos','Favorites']
+Allfeaturefullwithoutcredit=Textfeaturesingle+Userfeaturefull+fullfeatureonly+Tweetfeaturesingle
+pickfeature= ['creditScore',
+              'QuestionExclamation',
+              'Exclamation',
+              'UrlRankIn5000',
+              'UserrepitationScore',
+              'Usertweets_count',
+              'Userfollowers_count',
+              'UserIsInLargeCity',
+              'Userverified',
+              'ContainNEWS',
+              'Hashtag',
+              'Userfriends_count',
+              'Question',
+              'Menstion',
+              'Contain_videos',
+              'Isretweet',
+              'I',
+              'UserNumphoto',
+              'numUrls',
+              'NumChar',
+              'NumNegativeWords']  #['WotScore']#+Userfeaturesingle+Textfeaturesingle_old+['Hashtag','Menstion','numUrls','Retweets','Isretweet','NumPhotos','Favorites']
 
 def getNewsEventID():
     id=[]

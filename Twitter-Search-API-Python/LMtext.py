@@ -44,7 +44,8 @@ def fittoSpikeM(dat):
 
     x0 =  [N*0.8,0.5,11,10,0,1,0.5,10,1,0.5,10]
     p = optimization.leastsq(residuals,x0, args=( dat,dat))[0]
-    return p[7],p[8],p[10]
+    #return p[7],p[8],p[10]
+    return p[7],p[8],p[9],p[10],p[11],p[12]
 
 # import pylab
 # dat=pylab.loadtxt("/Users/licheng5625/Downloads/spikeM/data.txt")

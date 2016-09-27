@@ -12,7 +12,7 @@ os.environ['LC_ALL'] = 'en_US.UTF-8'
 
 os.environ['LANG'] = 'en_US.UTF-8'
 import json
-import path
+import mypath as path
 findspark.init(spark_home='/Applications/spark-1.6.1')
 
 from pyspark import SparkContext, SparkConf
@@ -219,6 +219,13 @@ def getReputationScore(follower,following):
 mytweet=None
 
 
+def containDebunkWords(V):
+    Iword=['rumor','hoax','HOAX','RUMOR','fake','not truth','not true','isn\'t truth','isn\'t true','are\'t truth','are\'t true','false']
+    for iword in Iword:
+        if iword in V:
+            return 1
+    return 0
+
 def getrepitationScore(following,follower):
     if follower is 0:
         return 0
@@ -267,12 +274,12 @@ def getUserFromID(id):
         user['user_id']=int(id)
         return user
 
-datafolder=path.TweetJSONpath+'news/'
-descriptionFile=path.TweetJSONpath+'descriptionNews.txt'
-outputFile=path.Featurepath+'featuresNewsNumphoto.txt'
-# datafolder=path.TweetJSONpath+'rumors/'
-# descriptionFile=path.TweetJSONpath+'descriptionRumors.txt'
+# datafolder=path.TweetJSONpath+'news/'
+# descriptionFile=path.TweetJSONpath+'descriptionNews.txt'
 # outputFile=path.Featurepath+'featuresNewsNumphoto.txt'
+datafolder=path.TweetJSONpath+'rumors/'
+descriptionFile=path.TweetJSONpath+'descriptionRumors.txt'
+outputFile=path.Featurepath+'featuresrumorsNumphoto.txt'
 
 timeformate='%I:%M %p - %d %b %Y'
 timetoday=datetime.datetime.strptime("10 7 2016",'%d %m %Y')
@@ -331,7 +338,7 @@ for root, dirs, files in list_dirs:
                                                         # 'WotScore':getWOT(v1[1]["extend_urls"]),
                                                         # 'ContainNEWS':getUrlNews(v1[1]["extend_urls"]),
                                                         # 'UrlRank':getUrlRank(v1[1]["extend_urls"]),
-                                                          'UrlRankIn5000':getUrlRankIn5000(v1[1]["extend_urls"])},
+                                                        #  'UrlRankIn5000':getUrlRankIn5000(v1[1]["extend_urls"]),
                                                         # 'Favorites':v1[1]['favorites'],
                                                         # 'Hashtag':len(v1[1]['hashtags']),
                                                         # 'Isretweet':tranto01(v1[1]['isretweet']),
@@ -359,7 +366,8 @@ for root, dirs, files in list_dirs:
                                                         # 'UserJoin_date':(timetoday-datetime.datetime.strptime(getUserFromID(v1[1]["user_id"])['Join_date'],timeformate)).days ,
                                                         # 'NumPhotos':v1[1]['contain_photos_number'],#32
                                                         # 'UserNumphoto':getUserFromID(v1[1]["user_id"])['photos_count'],
-                                                        # 'UserIsInLargeCity':tranto01(getUserFromID(v1[1]["user_id"])['location'] in mapUsersLargeCitySet)},
+                                                        # 'UserIsInLargeCity':tranto01(getUserFromID(v1[1]["user_id"])['location'] in mapUsersLargeCitySet),
+                                                        'debunkingWords':containDebunkWords(v1[1]['text'])},
                                                         'time':getHours(begindate,v1[0])}
 
                                             )).collect()

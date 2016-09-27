@@ -12,7 +12,7 @@ os.environ['LC_ALL'] = 'en_US.UTF-8'
 
 os.environ['LANG'] = 'en_US.UTF-8'
 import json
-import path
+import mypath as path
 findspark.init(spark_home='/Applications/spark-1.6.1')
 
 from pyspark import SparkContext, SparkConf
@@ -245,6 +245,7 @@ checklist=list()
 timeformate='%I:%M %p - %d %b %Y'
 timetoday=datetime.datetime.strptime("10 7 2016",'%d %m %Y')
 list_dirs = os.walk(path.datapath+'/webpagefortwitter/Tweet_JSON/newsBBC/')
+outputfile=
 for root, dirs, files in list_dirs:
     for file in files:
         if ('.txt'in file):#and title.replace(' ','_') in file):
@@ -285,8 +286,6 @@ for root, dirs, files in list_dirs:
                                 return 1
                             else:
                                 return 0
-            #print(type(timetoday))
-            #TweetNum=map3.filter(lambda v1:v1[0]>=begindate).filter(lambda v1:v1[0]<=enddate).map(lambda v1:(getHours(begindate,v1[0]),v1[1])).reduceByKey(lambda v1,v2:v1+v2).map(lambda v1:[v1[0],v1[1]]).sortByKey(True,1).collect()
             maplenthofTweet=rootJSONMap.map(lambda v1:(len(v1[1]['text']),
                                                        #v1[1]['tweet_id'],
                                                         sid.polarity_scores(v1[1]["text"])['compound'],
@@ -322,98 +321,7 @@ for root, dirs, files in list_dirs:
                                                         (timetoday-datetime.datetime.strptime(getUserFromID(v1[1]["user_id"])['Join_date'],timeformate)).days ,
                                                         1
                                             )).collect()
-            #maplenthofTweet=getAvg(TweetNum,maplenthofTweet)
 
-            # mapPositiveScoer=rootJSONMap.map(lambda v1:(v1[1]['tweet_id'],sid.polarity_scores(v1[1]["text"])['compound'])).collect()
-            #
-            # #mapNumPositive=rootJSONMap.map(lambda v1:getposive(id.polarity_scores(v1[1]["text"])['compound']>0)).map(lambda v1:(getHours(begindate,v1[0]),1)).reduceByKey(lambda v1,v2:v1+v2).sortByKey(True,1).collect()
-            #
-            # mapPositiveWord=rootJSONMap.map(lambda v1:(v1[1]['tweet_id'],len(getPositiveWords(v1[1]["text"])))).collect()
-            #
-            # mapURL=rootJSONMap.map(lambda v1:(v1[1]['tweet_id'],len(v1[1]["urls"]))).collect()
-            #
-            #
-            # mapHashtag=rootJSONMap.map(lambda v1:(v1[1]['tweet_id'],len(v1[1]['hashtags']))).collect()
-            #
-            #
-            # mapI=rootJSONMap.map(lambda v1:(v1[1]['tweet_id'],containI(v1[1]['text']))).collect()
-            #
-            # mapMention=rootJSONMap.map(lambda v1:(v1[1]['tweet_id'],len(v1[1]['menstion']))).collect()
-            #
-            # mapQuestion=rootJSONMap.map(lambda v1:(v1[1]['tweet_id'],containQuestion(v1[1]['text']))).collect()
-            #
-            # mapExclamation=rootJSONMap.map(lambda v1:(v1[1]['tweet_id'],containexclamation(v1[1]['text']))).collect()
-            #
-            # #mapQuestionExclamation=rootJSONMap.map(lambda v1:(containQuestion(v1[1]['text'])>1 or containexclamation(v1[1]['text'])>1)).map(lambda v1:(getHours(begindate,v1[0]),1)).reduceByKey(lambda v1,v2:v1+v2).sortByKey(True,1).collect()
-            #
-            # mapUser=rootJSONMap.map(lambda v1:((v1[1]['tweet_id'],getUserFromID(v1[1]["user_id"]))))
-            # #mapUserNum=rootJSONMap.map(lambda v1:(v1[0],v1[1]["user_id"])).map(lambda v1:(getHours(begindate,v1[0]),1)).reduceByKey(lambda v1,v2:v1+v2).sortByKey(True,1).collect()
-            #
-            #
-            # mapUserDescription=mapUser.map(lambda v1:(v1[0],len(v1[1]['Description']))).collect()#.map(lambda v1:(getHours(begindate,v1[0]),1)).reduceByKey(lambda v1,v2:v1+v2).sortByKey(True,1).collect()
-            #
-            #
-            # mapUserPhoto=mapUser.map(lambda v1:(v1[0],v1[1]['photos_count'])).collect()
-            #
-            #
-            # # maplargeCity=sc.parallelize(largecitylist)
-            # # mapUsersLargeCity=mapUser.map(lambda v1:(v1[1]['location'],1)).filter(lambda v:(v[0]!='')).reduceByKey(lambda v1,v2:v1+v2).map(lambda v1:v1[0])#.sortByKey(True,1).collect()
-            # # mapUsersLargeCitySet=mapUsersLargeCity.cartesian(maplargeCity).filter(lambda v1:(v1[0] is not None and v1[1] in v1[0])).map(lambda v:v[0]).collect()
-            # # mapUsersInLargeCity=mapUser.filter(lambda v1:v1[1]['location'] in mapUsersLargeCitySet).map(lambda v1:(getHours(begindate,v1[0]),1)).reduceByKey(lambda v1,v2:v1+v2).sortByKey(True,1).collect()
-            # # mapUsersInLargeCity=getAvg(mapUserNum,mapUsersInLargeCity)
-            #
-            #
-            #
-            # mapUserVerified=mapUser.map(lambda v1:((v1[0],tranto01(v1[1]['verified'])))).collect()
-            # #mapUserVerified=getAvg(mapUserNum,mapUserVerified)
-            #
-            # mapUserFollower=mapUser.map(lambda v1:(v1[0],v1[1]['followers_count'])).collect()#.map(lambda v1:(getHours(begindate,v1[0]),v1[1])).reduceByKey(lambda v1,v2:v1+v2).sortByKey(True,1).collect()
-            # #mapUserFollower=getAvg(mapUserNum,mapUserFollower)
-            #
-            #
-            # mapUserFollowing=mapUser.map(lambda v1:(v1[0],v1[1]['friends_count'])).collect()#.map(lambda v1:(getHours(begindate,v1[0]),v1[1])).reduceByKey(lambda v1,v2:v1+v2).sortByKey(True,1).collect()
-            # #mapUserFollowing=getAvg(mapUserNum,mapUserFollowing)
-            #
-            #
-            # mapUserReputationScore=mapUser.map(lambda v1:(v1[0],getrepitationScore(float(v1[1]['followers_count']),v1[1]['friends_count']))).collect()#.map(lambda v1:(getHours(begindate,v1[0]),v1[1])).reduceByKey(lambda v1,v2:v1+v2).sortByKey(True,1).collect()
-            # #mapUserReputationScore=getAvg(mapUserNum,mapUserReputationScore)
-            #
-            #
-            # mapUserPost=mapUser.map(lambda v1:(v1[0],v1[1]['tweets_count'])).map(lambda v1:(getHours(begindate,v1[0]),v1[1])).collect()#.reduceByKey(lambda v1,v2:v1+v2).sortByKey(True,1).collect()
-            # #mapUserPost=getAvg(mapUserNum,mapUserPost)
-            #
-            # #print(mapUser.filter(lambda v1:( (v1[1]['Join_date'])is None)).sortByKey(True,1).collect())
-            # mapUserResistation=mapUser.map(lambda v1:(v1[0],(timetoday-datetime.datetime.strptime(v1[1]['Join_date'],timeformate)).days)).map(lambda v1:(getHours(begindate,v1[0]),v1[1])).collect()#.reduceByKey(lambda v1,v2:v1+v2).sortByKey(True,1).collect()
-            # #mapUserResistation=getAvg(mapUserNum,mapUserResistation)
-            #
-            #
-            #
-            # # mapUserFollower=mapUser.map(lambda v1:(v1[0],getReputationScore(v1[1]['followers_count'],v1[1]['friends_count']))).map(lambda v1:(getHours(begindate,v1[0]),v1[1])).reduceByKey(lambda v1,v2:v1+v2).sortByKey(True,1).collect()
-            # # mapUserFollower=getAvg(mapUserNum,mapUserFollower)
-            # #mapUserNum=setTOdict(mapUserNum)
-            #
-            #
-            # output=dict()
-            # output['name']=title
-            # output['maplenthofTweet']=maplenthofTweet
-            # output['mapPositiveScoer']=mapPositiveScoer
-            # #output['mapNumPositive']=mapNumPositive
-            # output['mapPositiveWord']=mapPositiveWord
-            # output['mapURL']=mapURL
-            # output['mapHashtag']=mapHashtag
-            # output['mapI']=mapI
-            # output['mapMention']=mapMention
-            # output['mapQuestion']=mapQuestion
-            # output['mapExclamation']=mapExclamation
-            # #output['mapQuestionExclamation']=mapQuestionExclamation
-            # output['mapUserDescription']=mapUserDescription
-            # output['mapUserPhoto']=mapUserPhoto
-            # #output['mapUsersInLargeCity']=mapUsersInLargeCity
-            # output['mapUserFollower']=mapUserFollower
-            # output['mapUserFollowing']=mapUserFollowing
-            # output['mapUserPost']=mapUserPost
-            # output['mapUserResistation']=mapUserResistation
-            # output['mapUserReputationScore']=mapUserReputationScore
             with open('/Users/licheng5625/PythonCode/masterarbeit/data/webpagefortwitter/Tweet_JSON/datasingleNewsBBC.txt', mode='a') as writer:
                 for tweet in maplenthofTweet:
                     JSON=json.dumps(tweet)

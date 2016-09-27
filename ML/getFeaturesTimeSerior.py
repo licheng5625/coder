@@ -9,7 +9,7 @@ os.environ['LC_ALL'] = 'en_US.UTF-8'
 
 os.environ['LANG'] = 'en_US.UTF-8'
 import json
-import path
+import mypath as path
 
 import datetime
 
@@ -21,17 +21,18 @@ def addfrombefore(datalist):
     return datalist
     #return json.loads(jsontext)["items_html"]
 
+
+# datafolder=path.TweetJSONpath+'news/'
+# descriptionFile=path.TweetJSONpath+'descriptionNews.txt'
+# outputFile=path.Featurepath+'featuresNewsTimeSeriorCredit.txt'
+# Singlefeautrefile=path.Featurepath+'featuresNews.txt'
+
+
 #
-datafolder=path.TweetJSONpath+'news/'
-descriptionFile=path.TweetJSONpath+'descriptionNews.txt'
-outputFile=path.Featurepath+'featuresNewsTimeSeriorCredit.txt'
-Singlefeautrefile=path.Featurepath+'featuresNews.txt'
-
-
-# datafolder=path.TweetJSONpath+'rumors/'
-# descriptionFile=path.TweetJSONpath+'descriptionRumors.txt'
-# outputFile=path.Featurepath+'featuresRumorsTimeSeriorCredit.txt'
-# Singlefeautrefile=path.Featurepath+'featuresRumors.txt'
+datafolder=path.TweetJSONpath+'rumors/'
+descriptionFile=path.TweetJSONpath+'descriptionRumors.txt'
+outputFile=path.Featurepath+'featuresRumorsTimeSeriorCredit.txt'
+Singlefeautrefile=path.Featurepath+'featuresRumors.txt'
 
 isrumor=0
 eventdict={}
@@ -118,11 +119,11 @@ for root, dirs, files in list_dirs:
                 ContainNEWS=0           #34
                 Isretweet=0             #35
                 creditScore=0
+                DebunkingWords=0
                 UrlRankIn5000=0
-
                 features={}
                 outputfeature['features']["F"+str(i)]=features
-                #features['Ps'],features['Qp'],features['Qs']=LMtext.fittoSpikeM(volumeperHour[:i])
+                #features['Pp'],features['Pa'],features['Ps'],features['Qa'],features['Qp'],features['Qs']=LMtext.fittoSpikeM(volumeperHour[:i])
                 for tweet in tweetlist[i]:
                     # Userfollowers_count+=tweet['Userfollowers_count']
                     # PositiveScoer+=tweet['PositiveScoer']
@@ -152,7 +153,7 @@ for root, dirs, files in list_dirs:
                     # Userverified+=tweet['Userverified']
                     # Menstion+=tweet['Menstion']
                     # UrlRank+=tweet['UrlRank']
-                      UrlRankIn5000+=tweet['UrlRankIn5000']
+                    UrlRankIn5000+=tweet['UrlRankIn5000']
                     # Userfriends_count+=tweet['Userfriends_count']
                     # NumPhotos+=tweet['NumPhotos']
                     # NumChar+=tweet['NumChar']
@@ -162,7 +163,7 @@ for root, dirs, files in list_dirs:
                     # ContainNEWS+=tweet['ContainNEWS']
                     # Isretweet+=tweet['Isretweet']
                     # creditScore+=tweet['creditScore']
-
+                    DebunkingWords+=tweet['DebunkingWords']
 
 
                 # features['Userfollowers_count']=Userfollowers_count/float(volume)
@@ -172,7 +173,7 @@ for root, dirs, files in list_dirs:
                 # features['NumPositiveWords']=NumPositiveWords/float(volume)
                 # features['You']=You/float(volume)
                 features['UrlRankIn5000']=UrlRankIn5000/float(volume)
-
+                features['DebunkingWords']=DebunkingWords/float(volume)
                 # if numUrls!=0:
                 #     features['WotScore']=WotScore/float(numUrls)
                 #     features['UrlRank']=UrlRank/float(numUrls)

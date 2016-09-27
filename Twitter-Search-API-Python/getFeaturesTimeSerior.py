@@ -12,7 +12,7 @@ os.environ['LC_ALL'] = 'en_US.UTF-8'
 
 os.environ['LANG'] = 'en_US.UTF-8'
 import json
-import path
+import mypath as path
 
 import datetime
 
@@ -25,16 +25,16 @@ def addfrombefore(datalist):
     #return json.loads(jsontext)["items_html"]
 
 #
-datafolder=path.TweetJSONpath+'news/'
-descriptionFile=path.TweetJSONpath+'descriptionNews.txt'
-outputFile=path.Featurepath+'featuresNewsTimeSeriorCredit.txt'
-Singlefeautrefile=path.Featurepath+'featuresNews.txt'
+# datafolder=path.TweetJSONpath+'news/'
+# descriptionFile=path.TweetJSONpath+'descriptionNews.txt'
+# outputFile=path.Featurepath+'featuresNewsTimeSeriorCredit.txt'
+# Singlefeautrefile=path.Featurepath+'featuresNews.txt'
 
 
-# datafolder=path.TweetJSONpath+'rumors/'
-# descriptionFile=path.TweetJSONpath+'descriptionRumors.txt'
-# outputFile=path.Featurepath+'featuresRumorsTimeSeriorCredit.txt'
-# Singlefeautrefile=path.Featurepath+'featuresRumors.txt'
+datafolder=path.TweetJSONpath+'rumors/'
+descriptionFile=path.TweetJSONpath+'descriptionRumors.txt'
+outputFile=path.Featurepath+'featuresRumorsTimeSeriorCredit.txt'
+Singlefeautrefile=path.Featurepath+'featuresRumors.txt'
 
 isrumor=0
 eventdict={}
@@ -125,7 +125,7 @@ for root, dirs, files in list_dirs:
                 features={}
                 outputfeature['features']["F"+str(i)]=features
                 #features['Ps'],features['Qp'],features['Qs']=LMtext.fittoSpikeM(volumeperHour[:i])
-                #for tweet in tweetlist[i]:
+                for tweet in tweetlist[i]:
                     # Userfollowers_count+=tweet['Userfollowers_count']
                     # PositiveScoer+=tweet['PositiveScoer']
                     # Smile+=tweet['Smile']
@@ -162,7 +162,7 @@ for root, dirs, files in list_dirs:
                     # lenthofTweet+=tweet['lenthofTweet']
                     # ContainNEWS+=tweet['ContainNEWS']
                     # Isretweet+=tweet['Isretweet']
-                    #creditScore+=tweet['creditScore']
+                    creditScore+=tweet['creditScore']
 
 
 
@@ -207,7 +207,7 @@ for root, dirs, files in list_dirs:
                 # features['Isretweet']=Isretweet/float(volume)
                 #features['Sad']=Sad/float(volume)
                 #features['Question']=Question/float(volume)
-                #features['creditScore']=creditScore/float(volume)
+                features['creditScore']=creditScore/float(volume)
                 if (i!=0):
                     features={}
                     outputfeature['features']["S"+str(i)]=features

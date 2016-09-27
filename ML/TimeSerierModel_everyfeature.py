@@ -7,7 +7,7 @@ import csv
 
 listofrumor=list()
 listofnews=list()
-import  path
+import  mypath as path
 import featuresdecription
 from sklearn.neural_network import MLPClassifier
 
@@ -76,69 +76,64 @@ def getFeauture(tweet,maxtime,indexfeatureslist):
     return allfeaturelist
 
 indeslixt=[]
-for i in range(len(listofrumor)+len(listofnews)):
-    indeslixt.append(i)
-    i+=1
-random.seed(0)
-random.shuffle(indeslixt)
+with open(path.Featurepath+'indexshuffled.txt',encoding='utf-8',mode='r') as writer:
+     indeslixt=json.loads(writer.read())
+
+pickedFeatures=featuresdecription.Allfeaturefull
+times=10
+lenofpiece=int(len(indeslixt)/times+0.5)
 allresult=[{} for x in range(49)]
-for maxtime in range(48,49):
+for maxtime in range(1,49):
 
     result={}
     for feature in featuresdecription.Allfeaturefull:
     # 1---48 hors
-        listofPara=list()
-        listofresult=list()
+        scores=[]
+        for time in range(times):
+            listofPara=list()
+            listofresult=list()
 
-        listofParatest=list()
-        listofresulttest=list()
+            listofParatest=list()
+            listofresulttest=list()
 
-        for rumor in listofrumor:
-            listofPara.append(getFeauture(rumor,maxtime,[feature]))
-            listofresult.append(1)
-        for news in listofnews:
-            listofPara.append(getFeauture(news,maxtime,[feature]))
-            listofresult.append(-1)
+            for rumor in listofrumor:
+                if rumor['eventID'] not in  indeslixt[time*lenofpiece: time*lenofpiece+lenofpiece]:
+                    listofPara.append(getFeauture(rumor,maxtime,[feature]))
+                    listofresult.append(1)
+                else:
+                    listofParatest.append(getFeauture(rumor,maxtime,[feature]))
+                    listofresulttest.append(1)
 
-
-        def getscore(times,listofPara,listofresult):
-            scores=[]
+            for news in listofnews:
+                if news['eventID'] not in  indeslixt[time*lenofpiece: time*lenofpiece+lenofpiece]:
+                    listofPara.append(getFeauture(news,maxtime,[feature]))
+                    listofresult.append(-1)
+                else:
+                    listofParatest.append(getFeauture(news,maxtime,[feature]))
+                    listofresulttest.append(-1)
             scaler = StandardScaler()
             scaler.fit(listofPara)
             listofPara = scaler.transform(listofPara)
+            listofParatest = scaler.transform(listofParatest)
 
-            for time in range(times):
-                templistofpara=[]
-                templistofresult=[]
-                templistoftestpara=[]
-                templistoftestresult=[]
-                #print((indeslixt))
-                for eee in range(len(listofPara)):
-                    if eee not in  indeslixt[time*int(len(listofPara)/times):time*int(len(listofPara)/times)+int(len(listofPara)/times)]:
-                        templistofpara.append(listofPara[eee])
-                        templistofresult.append(listofresult[eee])
-                    else:
-                        templistoftestpara.append(listofPara[eee])
-                        templistoftestresult.append(listofresult[eee])
-                clf=random_forest_classifier(templistofpara, templistofresult)
-                score = metrics.accuracy_score(clf.predict(templistoftestpara), (templistoftestresult))
-                scores.append(score)
+            # clf = SVM_classifier(listofPara, listofresult)
+            #clf=MLP_classifier(listofPara, listofresult)
 
-            return scores
-
-
-
-        scores=getscore(10,listofPara,listofresult)
+            clf=random_forest_classifier(listofPara, listofresult)
+            score = metrics.accuracy_score(clf.predict(listofParatest), (listofresulttest))
+            scores.append(score)
         avg=sum(scores) / float(len(scores))
+
+
         result[feature]=avg
     sortkeys=sorted(result, key=result.__getitem__,reverse=True)
     i=0
     for key in sortkeys:
         allresult[maxtime][key]=i
         i+=1
-        print('\''+key+'\'',)
+        #print('\''+key+'\'',)
 
-with open(path.Featurepath+"rankedfeatures2.csv",encoding='utf-8', mode='w') as csvfile:
+with open(path.Featurepath+"rankedfeatures3.csv",encoding='utf-8', mode='w') as csvfile:
     writermix = csv.DictWriter(csvfile, fieldnames=['time']+featuresdecription.Allfeaturefull)
     writermix.writeheader()
 
@@ -147,13 +142,3 @@ with open(path.Featurepath+"rankedfeatures2.csv",encoding='utf-8', mode='w') as 
         rankedfeature['time']=time
         writermix.writerow(rankedfeature)
 
-    #avg=sum(result) / float(len(result))
-    #print(feature +'    '+str(avg))
-    #print('  '+str(maxtime)+'    '+str(avg))
-
-  # 1    0.721875
-  # 2    0.778125
-  # 3    0.81875
-  # 4    0.753125
-  # 5    0.809375
-  # 6    0.803125

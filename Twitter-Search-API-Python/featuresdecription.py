@@ -1,4 +1,4 @@
-import path
+import mypath as path
 import json
 Userfeaturefull=['Userfollowers_count','Userfriends_count','UserrepitationScore',
                    'UserJoin_date','UserDescription','Usertweets_count',
@@ -22,26 +22,52 @@ Textfeaturesingle_old=['lenthofTweet','NumPositiveWords','PositiveScoer',
                    'Question','Exclamation','QuestionExclamation']
 
 Tweetfeaturesingle=['Hashtag','Menstion','numUrls','Retweets','Isretweet',
+                    'NumPhotos','Favorites',
+                    'Contain_videos']
+Tweetfeaturesfull=['Hashtag','Menstion','numUrls','Retweets','Isretweet',
                     'NumPhotos','Favorites','ContainNEWS',
-                    'Contain_videos','WotScore','UrlRank']
-
+                    'Contain_videos','WotScore','UrlRankIn5000','UrlRank']
 
 Tweetfeaturesingle_Old=['Hashtag','Menstion','numUrls','Retweets','Isretweet',
                     'NumPhotos','Favorites']
 
-fullfeatureonly=['Ps','Qp','Qs']
+fullfeatureonly=['Ps','Pa','Pp','Qp','Qa','Qs']
 creditScor=['creditScore']
 
 AllfeaturesingleOld=Userfeaturesingle+Textfeaturesingle_old+Tweetfeaturesingle_Old
 Allfeaturesingle=Userfeaturesingle+Textfeaturesingle+Tweetfeaturesingle
 
 
-Allfeaturefull=Textfeaturesingle+Userfeaturefull+fullfeatureonly+Tweetfeaturesingle+['creditScore']
+Allfeaturefull=Textfeaturesingle+Userfeaturefull+fullfeatureonly+Tweetfeaturesfull#+['creditScore']
 AllfeaturefullOld=Userfeaturesingle+Textfeaturesingle_old+Tweetfeaturesingle_Old#+['creditScore']
+Allfeaturefullwithoutcredit=Textfeaturesingle+Userfeaturefull+fullfeatureonly+Tweetfeaturesingle
 
-pickfeature=['lenthofTweet','NumChar','Capital','Smile','Sad','NumPositiveWords','NumNegativeWords','PositiveScoer'
-             ,'I','You','HeShe','Userfriends_count','Userfollowers_count','QuestionExclamation','Exclamation'
-            ,'Question','Stock','Via' ]#['WotScore']#+Userfeaturesingle+Textfeaturesingle_old+['Hashtag','Menstion','numUrls','Retweets','Isretweet','NumPhotos','Favorites']
+
+featureTypes={'Userfeature':Userfeaturefull,'Textfeature':Textfeaturesingle,'Tweetfeature':Tweetfeaturesfull,'creditScor':creditScor,
+              "spikM":fullfeatureonly
+              }
+
+pickfeature= ['creditScore',
+              'QuestionExclamation',
+              'Exclamation',
+              'UrlRankIn5000',
+              'UserrepitationScore',
+              'Usertweets_count',
+              'Userfollowers_count',
+              'UserIsInLargeCity',
+              'Userverified',
+              'ContainNEWS',
+              'Hashtag',
+              'Userfriends_count',
+              'Question',
+              'Menstion',
+              'Contain_videos',
+              'Isretweet',
+              'I',
+              'UserNumphoto',
+              'numUrls',
+              'NumChar',
+              'NumNegativeWords']  #['WotScore']#+Userfeaturesingle+Textfeaturesingle_old+['Hashtag','Menstion','numUrls','Retweets','Isretweet','NumPhotos','Favorites']
 
 def getNewsEventID():
     id=[]

@@ -231,8 +231,17 @@ def multisvm(testevent,eventids,listofrumorevents,listofnewsevents,classifier):
     accuracy = metrics.accuracy_score(y_test, predict)
     print (str(testevent)+'    '+classifier+' accuracy: %.2f%%' % (100 * accuracy))
 
-# score = metrics.accuracy_score(clf.predict((x_test)), (y_test))
-# print(score)
+
+def getcreditScore():
+        scaler = StandardScaler()
+        scaler.fit(x_train)
+        x_train = scaler.transform(x_train)
+        x_test = scaler.transform(x_test)
+
+        modelclf = classifiers['RF'](x_train, y_train)
+        predict = modelclf.predict(x_test)
+        accuracy = metrics.accuracy_score(y_test, predict)
+
 
 outputFile=path.Featurepath+'tweetscore.txt'
 if __name__ == '__main__':
@@ -321,21 +330,6 @@ if __name__ == '__main__':
                 print(selectTweeID[x])
             predictlist[selectTweeID[x]]=str(predict[x])
             predictlist2[selectTweeID[x]]=y_test[x]
-        # couter=0
-        # discount=0
-        # for ID in predictlist.keys():
-        #     discount+=1
-        #     if int(predictlist[ID])==tweetID[ID]:
-        #         couter+=1
-        # print ('real accuracy: %.2f%%' % (100 * float(couter)/discount))
-        #
-        # couter=0
-        # discount=0
-        # for ID in predictlist2.keys():
-        #     discount+=1
-        #     if int(predictlist2[ID])==tweetID[ID]:
-        #         couter+=1
-        # print ('real accuracy: %.2f%%' % (100 * float(couter)/discount))
 
 
     with open(outputFile, mode='w') as writer:
@@ -353,100 +347,6 @@ if __name__ == '__main__':
 
 
 
-    # for testevent in eventids:
-    #     if testevent!=303:
-    #         continue
-    #     x_train,y_train,x_test,y_test,scaler=getTestAndTrainSetsSingle(Sublist(eventids,[testevent]),[testevent],listofrumorevents,listofnewsevents)
-        #modelref = classifiers['MLPRE'](x_train, y_train)
-        # for classifier in test_classifiers:
-        #     modelclf = classifiers[classifier](x_train, y_train)
-        #     predict = modelclf.predict(x_test)
-        #
-        #     accuracy = metrics.accuracy_score(y_test, predict)
-        #     print (str(testevent)+'    '+classifier+' accuracy: %.2f%%' % (100 * accuracy))
-
-
-
-
-
-
-        # isRumor=-1
-        # if testevent in listofrumorevents:
-        #     testevent=listofrumorevents[testevent]
-        #     isRumor=1
-        # else:
-        #     testevent=listofnewsevents[testevent]
-        # maplenthofTweet=[]
-        # for tweet in testevent:
-        #     retdict={'tweetid':tweet['tweetid'],"features":{}}
-        #     tweettest=np.array(getFeauture(tweet)).reshape(1, -1)
-        #     #print(tweettest.ndim)
-        #     tweettest=scaler.transform(tweettest)
-        #     ret=modelclf.predict(tweettest)
-        #     retdict["features"]['credit_score']=ret[0]
-        #     maplenthofTweet.append(retdict)
-        # maplenthofTweet={'eventID':testevent,'data':maplenthofTweet}
-        # outputFile=path.Featurepath+'tweetscore.txt'
-        # with open(outputFile, mode='a') as writer:
-        #         JSON=json.dumps(maplenthofTweet)
-        #         writer.write(JSON + '\n')
-
-
-
-
-
-
-
-
-# accuracy: 54.51%
-# accuracy: 84.91%
-# accuracy: 89.84%
-# accuracy: 25.58%
-# accuracy: 40.71%
-# accuracy: 61.47%
-# accuracy: 11.37%
-# accuracy: 97.97%
-# accuracy: 79.79%
-# accuracy: 18.00%
-# accuracy: 37.82%
-# accuracy: 69.49%
-# accuracy: 36.36%
-# accuracy: 90.70%
-# accuracy: 63.37%
-# accuracy: 93.90%
-# accuracy: 31.62%
-# accuracy: 47.62%
-# accuracy: 78.57%
-# accuracy: 91.89%
-# accuracy: 64.57%
-
-
-
-
-
-        # num_train, num_feat = train_x.shape
-        # num_test, num_feat = test_x.shape
-        #
-        # is_binary_class = (len(np.unique(train_y)) == 2)
-        # print ('******************** Data Info *********************' )
-        # print ('#training data: %d, #testing_data: %d, dimension: %d' % (num_train, num_test, num_feat)  )
-        #
-        # for classifier in test_classifiers:
-        #     print ('******************* %s ********************' % classifier)
-        #     start_time = time.time()
-        #     model = classifiers[classifier](train_x, train_y)
-        #     print ('training took %fs!' % (time.time() - start_time))
-        #     predict = model.predict(test_x)
-        #     # for i in range(len(predict)):
-        #     #     print(str(test_y[i])+'      '+str(predict[i]))
-        #     if model_save_file != None:
-        #         model_save[classifier] = model
-        #     if is_binary_class:
-        #         precision = metrics.precision_score(test_y, predict)
-        #         recall = metrics.recall_score(test_y, predict)
-        #         print( 'precision: %.2f%%, recall: %.2f%%' % (100 * precision, 100 * recall))
-        #     accuracy = metrics.accuracy_score(test_y, predict)
-        #     print ('accuracy: %.2f%%' % (100 * accuracy))
 
 
 
@@ -458,42 +358,3 @@ if __name__ == '__main__':
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-        # getTestAndTrainSetsSingle()
-        # num_train, num_feat = train_x.shape
-        # num_test, num_feat = test_x.shape
-        #
-        # is_binary_class = (len(np.unique(train_y)) == 2)
-        # print ('******************** Data Info *********************' )
-        # print ('#training data: %d, #testing_data: %d, dimension: %d' % (num_train, num_test, num_feat)  )
-        #
-        # for classifier in test_classifiers:
-        #     print ('******************* %s ********************' % classifier)
-        #     start_time = time.time()
-        #     model = classifiers[classifier](train_x, train_y)
-        #     print ('training took %fs!' % (time.time() - start_time))
-        #     predict = model.predict(test_x)
-        #     # for i in range(len(predict)):
-        #     #     print(str(test_y[i])+'      '+str(predict[i]))
-        #     if model_save_file != None:
-        #         model_save[classifier] = model
-        #     if is_binary_class:
-        #         precision = metrics.precision_score(test_y, predict)
-        #         recall = metrics.recall_score(test_y, predict)
-        #         print( 'precision: %.2f%%, recall: %.2f%%' % (100 * precision, 100 * recall))
-        #     accuracy = metrics.accuracy_score(test_y, predict)
-        #     print ('accuracy: %.2f%%' % (100 * accuracy))
-
-
-        #88.5320
-    #91.9527

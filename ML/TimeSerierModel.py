@@ -5,7 +5,7 @@ import random
 from sklearn import datasets, metrics,cross_validation
 listofrumor=list()
 listofnews=list()
-import  path
+import  mypath as path
 import featuresdecription
 from sklearn.neural_network import MLPClassifier
 
@@ -74,86 +74,124 @@ def getFeauture(tweet,maxtime,indexfeatureslist):
     return allfeaturelist
 
 indeslixt=[]
-for i in range(len(listofrumor)+len(listofnews)):
-    indeslixt.append(i)
-    i+=1
-random.seed(0)
-random.shuffle(indeslixt)
+# for i in range(len(listofrumor)+len(listofnews)):
+#     indeslixt.append(i)
+#     i+=1
+# for rumor in listofrumor:
+#     indeslixt.append(rumor['eventID'])
+# for news in listofnews:
+#     indeslixt.append(news['eventID'])
+# random.seed(0)
+# random.shuffle(indeslixt)
+with open(path.Featurepath+'indexshuffled.txt',encoding='utf-8',mode='r') as writer:
+     indeslixt=json.loads(writer.read())
 #print(indeslixt[:5])
 
 pickedFeatures=featuresdecription.Allfeaturefull
+times=10
+lenofpiece=int(len(indeslixt)/times+0.5)
 
 for maxtime in range(48,49):
+    scores=[]
+    if maxtime%3!=0:
+        continue
+    for time in range(times):
+        listofPara=list()
+        listofresult=list()
 
-    listofPara=list()
-    listofresult=list()
+        listofParatest=list()
+        listofresulttest=list()
 
-    listofParatest=list()
-    listofresulttest=list()
-    #for feature in featuresdecription.Allfeaturefull:
-    for rumor in listofrumor:
-        listofPara.append(getFeauture(rumor,maxtime,pickedFeatures))
-        listofresult.append(1)
-    for news in listofnews:
-        listofPara.append(getFeauture(news,maxtime,pickedFeatures))
-        listofresult.append(-1)
+        for rumor in listofrumor:
+            if rumor['eventID'] not in  indeslixt[time*lenofpiece: time*lenofpiece+lenofpiece]:
+                listofPara.append(getFeauture(rumor,maxtime,pickedFeatures))
+                listofresult.append(1)
+            else:
+                listofParatest.append(getFeauture(rumor,maxtime,pickedFeatures))
+                listofresulttest.append(1)
 
-
-
-
-    def getscore(times,listofPara,listofresult):
-        scores=[]
+        for news in listofnews:
+            if news['eventID'] not in  indeslixt[time*lenofpiece: time*lenofpiece+lenofpiece]:
+                listofPara.append(getFeauture(news,maxtime,pickedFeatures))
+                listofresult.append(-1)
+            else:
+                listofParatest.append(getFeauture(news,maxtime,pickedFeatures))
+                listofresulttest.append(-1)
         scaler = StandardScaler()
         scaler.fit(listofPara)
         listofPara = scaler.transform(listofPara)
-        #templistoftestpara = scaler.transform(templistoftestpara)
+        listofParatest = scaler.transform(listofParatest)
 
-        for time in range(times):
-            templistofpara=[]
-            templistofresult=[]
-            templistoftestpara=[]
-            templistoftestresult=[]
-            #print((indeslixt))
-            for eee in range(len(listofPara)):
-                if eee not in  indeslixt[time*int(len(listofPara)/times):time*int(len(listofPara)/times)+int(len(listofPara)/times)]:
-                    templistofpara.append(listofPara[eee])
-                    templistofresult.append(listofresult[eee])
-                else:
-                    templistoftestpara.append(listofPara[eee])
-                    templistoftestresult.append(listofresult[eee])
-            #clf = SVM_classifier(templistofpara, templistofresult)
-            #clf=MLP_classifier(templistofpara, templistofresult)
-            clf=random_forest_classifier(templistofpara, templistofresult)
-            #clf.fit(templistofpara, templistofresult)
-            score = metrics.accuracy_score(clf.predict(templistoftestpara), (templistoftestresult))
-            scores.append(score)
+        # clf = SVM_classifier(listofPara, listofresult)
+        #clf=MLP_classifier(listofPara, listofresult)
 
-        return scores
-
-
-
-    scores=getscore(10,listofPara,listofresult)
+        clf=random_forest_classifier(listofPara, listofresult)
+        score = metrics.accuracy_score(clf.predict(listofParatest), (listofresulttest))
+        scores.append(score)
     avg=sum(scores) / float(len(scores))
     print(str(avg))
+
+
+
+    # def getscore(times,listofPara,listofresult):
+    #     scores=[]
+    #     scaler = StandardScaler()
+    #     scaler.fit(listofPara)
+    #     listofPara = scaler.transform(listofPara)
+    #     #templistoftestpara = scaler.transform(templistoftestpara)
+    #
+    #     for time in range(times):
+    #         templistofpara=[]
+    #         templistofresult=[]
+    #         templistoftestpara=[]
+    #         templistoftestresult=[]
+    #         #print((indeslixt))
+    #         for event in listofPara:
+    #             if event['eventID'] not in  indeslixt[time*int(len(listofPara)/times):time*int(len(listofPara)/times)+int(len(listofPara)/times)]:
+    #                 templistofpara.append(listofPara[eee])
+    #                 templistofresult.append(listofresult[eee])
+    #             else:
+    #                 templistoftestpara.append(listofPara[eee])
+    #                 templistoftestresult.append(listofresult[eee])
+    #         #clf = SVM_classifier(templistofpara, templistofresult)
+    #         #clf=MLP_classifier(templistofpara, templistofresult)
+    #         clf=random_forest_classifier(templistofpara, templistofresult)
+    #         #clf.fit(templistofpara, templistofresult)
+    #         print(clf.predict(templistoftestpara))
+    #         score = metrics.accuracy_score(clf.predict(templistoftestpara), (templistoftestresult))
+    #         scores.append(score)
+    #
+    #     return scores
+
+
+
+    #scores=getscore(10,listofPara,listofresult)
+    #avg=sum(scores) / float(len(scores))
+    #print(str(avg))
     #print('  '+str(maxtime)+'    '+str(avg))
 
-
-# 0.75
-# 0.79375
-# 0.81875
-# 0.83125
-# 0.7875
-# 0.7875
-# 0.7875
-# 0.8125
-# 0.81875
-
-# 0.74375
-# 0.85
-# 0.79375
-# 0.81875
-# 0.8
-# 0.85625
-# 0.8375
-# 0.79375
-# 0.8125
+#
+# 0.77619047619
+# 0.793650793651
+# 0.768253968254
+# 0.757142857143
+# 0.768253968254
+# 0.771428571429
+# 0.779365079365
+# 0.785714285714
+# 0.790476190476
+# 0.834920634921
+# 0.815873015873
+# 0.849206349206
+# 0.87619047619
+# 0.863492063492
+# 0.874603174603
+# 0.849206349206
+# 0.852380952381
+# 0.919047619048
+# 0.852380952381
+# 0.919047619048
+# 0.860317460317
+# 0.919047619048
+# 0.930158730159
+# 0.885714285714

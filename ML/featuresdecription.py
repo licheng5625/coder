@@ -22,23 +22,34 @@ Textfeaturesingle_old=['lenthofTweet','NumPositiveWords','PositiveScoer',
                    'Question','Exclamation','QuestionExclamation']
 
 Tweetfeaturesingle=['Hashtag','Menstion','numUrls','Retweets','Isretweet',
+                    'NumPhotos','Favorites',
+                    'Contain_videos']
+Tweetfeaturesfull=['Hashtag','Menstion','numUrls','Retweets','Isretweet',
                     'NumPhotos','Favorites','ContainNEWS',
                     'Contain_videos','WotScore','UrlRankIn5000','UrlRank']
-
 
 Tweetfeaturesingle_Old=['Hashtag','Menstion','numUrls','Retweets','Isretweet',
                     'NumPhotos','Favorites']
 
-fullfeatureonly=['Ps','Qp','Qs']
+#fullfeatureonly=['Ps','Pa','Pp','Qp','Qa','Qs']
+fullfeatureonly=[ 'Pa' ]
+
 creditScor=['creditScore']
+crowdwisdom=['DebunkingWords']
 
 AllfeaturesingleOld=Userfeaturesingle+Textfeaturesingle_old+Tweetfeaturesingle_Old
 Allfeaturesingle=Userfeaturesingle+Textfeaturesingle+Tweetfeaturesingle
 
 
-Allfeaturefull=Textfeaturesingle+Userfeaturefull+fullfeatureonly+Tweetfeaturesingle+['creditScore']
+Allfeaturefull=Textfeaturesingle+Userfeaturefull+Tweetfeaturesfull+fullfeatureonly+['creditScore']+['DebunkingWords']
 AllfeaturefullOld=Userfeaturesingle+Textfeaturesingle_old+Tweetfeaturesingle_Old#+['creditScore']
 Allfeaturefullwithoutcredit=Textfeaturesingle+Userfeaturefull+fullfeatureonly+Tweetfeaturesingle
+
+
+featureTypes={'Userfeature':Userfeaturefull,'Textfeature':Textfeaturesingle,'Tweetfeature':Tweetfeaturesfull,'creditScore':creditScor,
+              "spikM":fullfeatureonly,'crowdwisdom':crowdwisdom,'allfeature':Allfeaturefull
+              }
+
 pickfeature= ['creditScore',
               'QuestionExclamation',
               'Exclamation',

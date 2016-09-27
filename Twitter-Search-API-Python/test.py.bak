@@ -1,0 +1,6 @@
+
+
+import urllib
+data = urllib.urlencode({ 'task': 'mac-status', 'mac': '78-DD-08-E5-78-7F' })
+
+url= urllib.urlopen('https://www.mac-status.de/index.php',data).read()

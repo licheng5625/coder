@@ -36,7 +36,7 @@ def fittoSpikeM(dat):
     dat=np.array(dat)
     lentgh=len(dat)
     for i in range(11-lentgh):
-        dat=np.append(dat,0)
+        dat=np.append(dat,1)
     #print((dat))
     global T
     T = len(dat)

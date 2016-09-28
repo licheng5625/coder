@@ -47,13 +47,9 @@ featureTypes={'Userfeature':Userfeaturefull,'Textfeature':Textfeaturesingle,'Twe
               "spikM":fullfeatureonly
               }
 
-pickfeature= ['creditScore',
-              'QuestionExclamation',
-              'Exclamation',
-              'UrlRankIn5000',
-              'UserrepitationScore',
-              'Usertweets_count',
-              'Userfollowers_count',
+pickfeature= ['creditScore','QuestionExclamation','Exclamation','UrlRankIn5000',
+              'UserrepitationScore','Usertweets_count',
+'Userfollowers_count',
               'UserIsInLargeCity',
               'Userverified',
               'ContainNEWS',

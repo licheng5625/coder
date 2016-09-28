@@ -25,7 +25,7 @@ with open(path.Featurepath+'featuresNewsTimeSerior.txt', mode='r') as writer:
 
 def random_forest_classifier(train_x, train_y):
     from sklearn.ensemble import RandomForestClassifier
-    model = RandomForestClassifier(n_estimators=10,random_state=1)
+    model = RandomForestClassifier(n_estimators=200,random_state=1,n_jobs=1)
     model.fit(train_x, train_y)
     return model
 
@@ -33,7 +33,7 @@ def random_forest_classifier(train_x, train_y):
 def MLP_classifier(train_x, train_y):
     clf = MLPClassifier(activation='relu', algorithm='adam', alpha=0.001,
                batch_size='auto', beta_1=0.9, beta_2=0.999, early_stopping=False,
-               epsilon=1e-08, hidden_layer_sizes=([20,20]), learning_rate='constant',
+               epsilon=1e-08, hidden_layer_sizes=([10,10]), learning_rate='constant',
                learning_rate_init=0.01, max_iter=300, momentum=0.9,
                nesterovs_momentum=True, power_t=0.5, random_state=0, shuffle=True,
                 validation_fraction=0.1, verbose=False,
@@ -42,7 +42,7 @@ def MLP_classifier(train_x, train_y):
     return clf
 
 def SVM_classifier(train_x, train_y):
-    clf = svm.SVC(C=3.5,random_state=0)
+    clf = svm.SVC(C=3,random_state=0)
     clf.fit(train_x, train_y)
     return clf
 featuresIndes=[]
@@ -52,6 +52,8 @@ def getFeauture(tweet,maxtime,indexfeatureslist):
     features=tweet['features']
     allfeaturelist=[]
     index=[]
+
+    # index.append('F'+str(maxtime))
     for i in range(maxtime+1):
         index.append('F'+str(i))
         if i !=0:
@@ -87,7 +89,9 @@ with open(path.Featurepath+'indexshuffled.txt',encoding='utf-8',mode='r') as wri
      indeslixt=json.loads(writer.read())
 #print(indeslixt[:5])
 
-pickedFeatures=featuresdecription.Allfeaturefull
+pickedFeatures=featuresdecription.pickfeature
+#pickedFeatures=featuresdecription.Allfeaturefull
+
 times=10
 lenofpiece=int(len(indeslixt)/times+0.5)
 
@@ -122,7 +126,7 @@ for maxtime in range(48,49):
         listofPara = scaler.transform(listofPara)
         listofParatest = scaler.transform(listofParatest)
 
-        # clf = SVM_classifier(listofPara, listofresult)
+        #clf = SVM_classifier(listofPara, listofresult)
         #clf=MLP_classifier(listofPara, listofresult)
 
         clf=random_forest_classifier(listofPara, listofresult)

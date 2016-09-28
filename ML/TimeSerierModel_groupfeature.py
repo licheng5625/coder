@@ -27,7 +27,7 @@ with open(path.Featurepath+'featuresNewsTimeSerior.txt', mode='r') as writer:
 
 def random_forest_classifier(train_x, train_y):
     from sklearn.ensemble import RandomForestClassifier
-    model = RandomForestClassifier(n_estimators=10,random_state=1)
+    model = RandomForestClassifier(n_estimators=150,random_state=1)
     model.fit(train_x, train_y)
     return model
 
@@ -84,7 +84,8 @@ times=10
 lenofpiece=int(len(indeslixt)/times+0.5)
 allresult=[{} for x in range(49)]
 for maxtime in range(1,49):
-
+    # if maxtime%3!=0:
+    #     continue
     result={}
     for feature in featuresdecription.featureTypes.keys():
     # 1---48 hors

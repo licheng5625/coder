@@ -12,7 +12,7 @@ os.environ['LC_ALL'] = 'en_US.UTF-8'
 
 os.environ['LANG'] = 'en_US.UTF-8'
 import json
-import path
+import mypath as path
 findspark.init(spark_home='/Applications/spark-1.6.1')
 
 from pyspark import SparkContext, SparkConf
@@ -47,33 +47,6 @@ sc = SparkContext(conf=conf)
 def sortBytweet(a):
     return a[1]
 
-largecitylist=list()
-with open(  path.datapath+"LargeCity.txt",encoding="utf-8", mode='r') as Seenlist:
-    for sentence in Seenlist:
-        largecitylist.append(sentence.replace('\n',''))
-
-def isInlargecity(city):
-    if len(city)<2:
-        return  False
-    for ct in largecitylist:
-        if ct in city:
-            return True
-    return False
-
-class TwitterDescribtor:
-    tweetFile =str()
-    tweetsNum=0
-    tweetsNumInPeekTime=0
-    tweets=list()
-    tweetsInPeekTime=list()
-    maxTweetsInDay=0
-    maxTweetsDay=str()
-    begindenDate=str()
-    endDate=str()
-    userlist=list()
-    userlistInPeekTime=list()
-    tweetsQuery=str()
-    tweetsQueryInGoogle=str()
 
 rumorlist=dict()
 with open(  path.datapath+"RumorsLIST.txt",encoding="utf-8", mode='r') as Seenlist:
@@ -140,42 +113,7 @@ def addfrombefore(datalist):
             datalist[i][1]+=datalist[i-1][1]
     return datalist
     #return json.loads(jsontext)["items_html"]
-userdict=dict()
-with open(path.USerJSONpath+'User_JSON.txt', mode='r')as Seenlist2:
-        for line in Seenlist2:
-            user=json.loads(line)
-            userdict[user['user_id']]=user
-def setTOdict(Toavg):
-    retdict=dict()
-    for toav in Toavg:
-        retdict[toav[0]]=toav[1]
-    return retdict
 
-def getUserFromID(id):
-    user = {
-            'data-background-image': None,
-            'user_id': id,
-            'user_screen_name': None,
-            'user_name': None,
-            'followers_count': 0,
-            'location':None,
-            'friends_count':0,
-            'favourites_count':0,
-            'photos_count':0,
-            'tweets_count':0,
-            'Join_date':'1:01 AM - 1 Aug 2016',
-            'Description':'',
-            'hashtagsInDescription':list(),
-            'menstionInDescription':list(),
-            'urlsInDescription':list(),
-            'url':None,
-            'verified':False
-        }
-    try:
-        return userdict[int(id)]
-    except KeyError:
-        user['user_id']=int(id)
-        return user
 
 checklist=list()
 
@@ -216,7 +154,7 @@ for root, dirs, files in list_dirs:
                 return Volume2
             rootJSONMap=rootmap.map(lambda line2:(getTimefromJson(line2),1)).filter(lambda v1:v1[0]>=begindate).filter(lambda v1:v1[0]<=enddate).map(lambda v1:(getHours(begindate,v1[0]),v1[1])).reduceByKey(lambda v1,v2:v1+v2).sortByKey(True,1)
             # map3 =rootmap.map(lambda line:(getTimefromJson(line),1)).reduceByKey(lambda v1,v2:v1+v2)
-            # TweetNum=map3.filter(lambda v1:v1[0]>=begindate).filter(lambda v1:v1[0]<=enddate).map(lambda v1:(getHours(begindate,v1[0]),v1[1])).reduceByKey(lambda v1,v2:v1+v2)
+            #TweetNum=map3.filter(lambda v1:v1[0]>=begindate).filter(lambda v1:v1[0]<=enddate).map(lambda v1:(getHours(begindate,v1[0]),v1[1])).reduceByKey(lambda v1,v2:v1+v2)
             # output=dict()
             # output['title']=title
             # output['volume']=TweetNum.map(lambda v:v[1]).collect()
@@ -225,25 +163,30 @@ for root, dirs, files in list_dirs:
             #     writer.write(JSON + '\n')
 
 
-            #TweetVolume = [0 for n in range(getHours(begindate,enddate))]
+            TweetVolume = [0 for n in range(getHours(begindate,enddate))]
            # percentOfUrl = [0 for n in range(getHours(begindate,enddate))]
 
-            # for data in TweetNum:
-            #      TweetVolume[data[0]]=TweetVolume[data[0]]+  data[1]
-            # with open('/Users/licheng5625/PythonCode/masterarbeit/data/webpagefortwitter/Tweet_JSON/data.txt', mode='w') as writer:
-            #     for vol in TweetVolume:
-            #         writer.write(str(vol)+'\n')
+            # dates=rootJSONMap.map(lambda v:v[0]).collect()
+            # times=rootJSONMap.map(lambda v:v[1]).collect()
+            outputs=rootJSONMap.collect()
+            for x  in range(len(TweetVolume)):
+                for output in outputs:
+                    if output[0]<=x:
+                        TweetVolume[x]+=output[1]
+            print(TweetVolume)
+            with open('/Users/licheng5625/PythonCode/masterarbeit/data/webpagefortwitter/Tweet_JSON/data.txt', mode='w') as writer:
+                #for vol in TweetVolume:
+                writer.write(str(TweetVolume)+'\n')
+
 
 
 ##画图表
-            import matplotlib.pyplot as plt
-            dates=None
-            times=None
-            dates=rootJSONMap.map(lambda v:v[0]).collect()
-            times=rootJSONMap.map(lambda v:v[1]).collect()
-            plt.plot(dates, times)
-            plt.xlabel('Hours')
-            plt.ylabel('#Tweets')
-            plt.title(title)
-            plt.savefig('/Users/licheng5625/PythonCode/masterarbeit/data/webpagefortwitter/Tweet_JSON/picture/News/'+title+'.png')
-            plt.close('all')
+            # import matplotlib.pyplot as plt
+            # dates=None
+            # times=None
+            # plt.plot(dates, times)
+            # plt.xlabel('Hours')
+            # plt.ylabel('#Tweets')
+            # plt.title(title)
+            # plt.savefig('/Users/licheng5625/PythonCode/masterarbeit/data/webpagefortwitter/Tweet_JSON/picture/News/'+title+'.png')
+            # plt.close('all')

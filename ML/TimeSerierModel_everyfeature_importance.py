@@ -33,7 +33,7 @@ def random_forest_classifier(train_x, train_y):
 
 def Extra_Trees_classifier(train_x, train_y):
     from sklearn.ensemble import ExtraTreesClassifier
-    model = ExtraTreesClassifier(n_estimators=10,random_state=1)
+    model = ExtraTreesClassifier(n_estimators=1000,random_state=1)
     model.fit(train_x, train_y)
     return model
 
@@ -60,13 +60,14 @@ def getFeauture(tweet,maxtime,indexfeatureslist):
     features=tweet['features']
     allfeaturelist=[]
     index=[]
-    for i in range(maxtime+1):
-        index.append('F'+str(i))
-        if i !=0:
-            index.append('S'+str(i))
+    index.append('F'+str(maxtime))
+
+    # for i in range(maxtime+1):
+    #     index.append('F'+str(i))
+    #     if i !=0:
+    #         index.append('S'+str(i))
     for key in index:
         featureslist=[]
-        #for featureIndex in featuresdecription.AllfeaturefullOld:#
         for featureIndex in indexfeatureslist:
             featureslist.append(features[key][featureIndex])
             featuresIndes.append(featureIndex)
@@ -143,7 +144,13 @@ with open(path.Featurepath+"rankedfeatures_importance.csv",encoding='utf-8', mod
         results={}
         for i in range(len(pickedFeatures)):
             results[pickedFeatures[i]]=importances[i]/times
+        sortkeys=sorted(results, key=results.__getitem__,reverse=True)
+        i=0
+        rankedresult={}
+        for key in sortkeys:
+            rankedresult [key]=i
+            i+=1
         #rankedfeature=results
         results['time']=maxtime
-        writermix.writerow(results)
+        writermix.writerow(rankedresult)
 

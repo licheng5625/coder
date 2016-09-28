@@ -31,9 +31,9 @@ Tweetfeaturesfull=['Hashtag','Menstion','numUrls','Retweets','Isretweet',
 Tweetfeaturesingle_Old=['Hashtag','Menstion','numUrls','Retweets','Isretweet',
                     'NumPhotos','Favorites']
 
-#fullfeatureonly=['Ps','Pa','Pp','Qp','Qa','Qs']
-fullfeatureonly=[ 'Pa' ]
-
+SpikeM=['Ps','Pa','Pp','Qp','Qa','Qs']
+#SpikeM=[ 'Pa' ]
+SIR=['beta','gamma']
 creditScor=['creditScore']
 crowdwisdom=['DebunkingWords']
 
@@ -41,36 +41,20 @@ AllfeaturesingleOld=Userfeaturesingle+Textfeaturesingle_old+Tweetfeaturesingle_O
 Allfeaturesingle=Userfeaturesingle+Textfeaturesingle+Tweetfeaturesingle
 
 
-Allfeaturefull=Textfeaturesingle+Userfeaturefull+Tweetfeaturesfull+fullfeatureonly+['creditScore']+['DebunkingWords']
+Allfeaturefull=Textfeaturesingle+Userfeaturefull+Tweetfeaturesfull+SpikeM+creditScor+crowdwisdom+SIR
 AllfeaturefullOld=Userfeaturesingle+Textfeaturesingle_old+Tweetfeaturesingle_Old#+['creditScore']
-Allfeaturefullwithoutcredit=Textfeaturesingle+Userfeaturefull+fullfeatureonly+Tweetfeaturesingle
+Allfeaturefullwithoutcredit=Textfeaturesingle+Userfeaturefull+SpikeM+Tweetfeaturesingle
 
 
+
+pickfeature= ['UserNumphoto','QuestionExclamation','UserrepitationScore','Userfollowers_count','UserrepitationScore',
+              'Question','Userfriends_count','DebunkingWords','ContainNEWS','creditScore','Usertweets_count',
+              'Pa','Via','WotScore','You','numUrls','NumPhotos','UserNumphoto','Menstion','UserIsInLargeCity',
+              'I','Capital','Userverified','UserDescription','UrlRankIn5000','NumChar','gamma','PositiveScoer']  #['WotScore']#+Userfeaturesingle+Textfeaturesingle_old+['Hashtag','Menstion','numUrls','Retweets','Isretweet','NumPhotos','Favorites']
 featureTypes={'Userfeature':Userfeaturefull,'Textfeature':Textfeaturesingle,'Tweetfeature':Tweetfeaturesfull,'creditScore':creditScor,
-              "spikM":fullfeatureonly,'crowdwisdom':crowdwisdom,'allfeature':Allfeaturefull
+              "spikM":SpikeM,'crowdwisdom':crowdwisdom,'allfeature':Allfeaturefull,'SIR':SIR,'bestset':pickfeature
               }
 
-pickfeature= ['creditScore',
-              'QuestionExclamation',
-              'Exclamation',
-              'UrlRankIn5000',
-              'UserrepitationScore',
-              'Usertweets_count',
-              'Userfollowers_count',
-              'UserIsInLargeCity',
-              'Userverified',
-              'ContainNEWS',
-              'Hashtag',
-              'Userfriends_count',
-              'Question',
-              'Menstion',
-              'Contain_videos',
-              'Isretweet',
-              'I',
-              'UserNumphoto',
-              'numUrls',
-              'NumChar',
-              'NumNegativeWords']  #['WotScore']#+Userfeaturesingle+Textfeaturesingle_old+['Hashtag','Menstion','numUrls','Retweets','Isretweet','NumPhotos','Favorites']
 
 def getNewsEventID():
     id=[]

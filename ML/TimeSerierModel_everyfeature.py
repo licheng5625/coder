@@ -83,7 +83,7 @@ pickedFeatures=featuresdecription.Allfeaturefull
 times=10
 lenofpiece=int(len(indeslixt)/times+0.5)
 allresult=[{} for x in range(49)]
-for maxtime in range(1,49):
+for maxtime in range(48,49):
 
     result={}
     for feature in featuresdecription.Allfeaturefull:

@@ -277,9 +277,9 @@ def getUserFromID(id):
 # datafolder=path.TweetJSONpath+'news/'
 # descriptionFile=path.TweetJSONpath+'descriptionNews.txt'
 # outputFile=path.Featurepath+'featuresNewsNumphoto.txt'
-datafolder=path.TweetJSONpath+'rumors/'
-descriptionFile=path.TweetJSONpath+'descriptionRumors.txt'
-outputFile=path.Featurepath+'featuresrumorsNumphoto.txt'
+# datafolder=path.TweetJSONpath+'rumors/'
+# descriptionFile=path.TweetJSONpath+'descriptionRumors.txt'
+# outputFile=path.Featurepath+'featuresrumorsNumphoto.txt'
 
 timeformate='%I:%M %p - %d %b %Y'
 timetoday=datetime.datetime.strptime("10 7 2016",'%d %m %Y')

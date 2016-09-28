@@ -12,7 +12,7 @@ import json
 import mypath as path
 
 import datetime
-
+import simpleSIR_fit
 import LMtext
 
 def addfrombefore(datalist):
@@ -22,17 +22,17 @@ def addfrombefore(datalist):
     #return json.loads(jsontext)["items_html"]
 
 
-# datafolder=path.TweetJSONpath+'news/'
-# descriptionFile=path.TweetJSONpath+'descriptionNews.txt'
-# outputFile=path.Featurepath+'featuresNewsTimeSeriorCredit.txt'
-# Singlefeautrefile=path.Featurepath+'featuresNews.txt'
+datafolder=path.TweetJSONpath+'news/'
+descriptionFile=path.TweetJSONpath+'descriptionNews.txt'
+outputFile=path.Featurepath+'featuresNewsTimeSeriorSIR.txt'
+Singlefeautrefile=path.Featurepath+'featuresNews.txt'
 
 
 #
-datafolder=path.TweetJSONpath+'rumors/'
-descriptionFile=path.TweetJSONpath+'descriptionRumors.txt'
-outputFile=path.Featurepath+'featuresRumorsTimeSeriorCredit.txt'
-Singlefeautrefile=path.Featurepath+'featuresRumors.txt'
+# datafolder=path.TweetJSONpath+'rumors/'
+# descriptionFile=path.TweetJSONpath+'descriptionRumors.txt'
+# outputFile=path.Featurepath+'featuresRumorsTimeSeriorSIR.txt'
+# Singlefeautrefile=path.Featurepath+'featuresRumors.txt'
 
 isrumor=0
 eventdict={}
@@ -67,6 +67,7 @@ for root, dirs, files in list_dirs:
             tweetlist=[[] for n in range(49)]
             #print(len(event))
             volumeperHour=[0 for n in range(49)]
+            volumetotal=[0 for n in range(49)]
             for tweet in event:
                 for i in range(49):
                     if tweet['time']== i:
@@ -75,10 +76,11 @@ for root, dirs, files in list_dirs:
                 for i in range(49):
                     if tweet['time']<= i:
                         #print(str(tweet['time'])+'add to '+str(i))
-
                         tweetlist[i].append(tweet['features'])
             totallnum.append(len(tweetlist[48]))
             print(len(tweetlist[48]))
+            for i in range(len(tweetlist)):
+                volumetotal[i]=len(tweetlist[i])
             outputfeature['features']={}
             for i in range(49):
                 volume=len(tweetlist[i])
@@ -123,8 +125,9 @@ for root, dirs, files in list_dirs:
                 UrlRankIn5000=0
                 features={}
                 outputfeature['features']["F"+str(i)]=features
+                features['beta'],features['gamma']=simpleSIR_fit.fitSIS(volumetotal[:i])[2:]
                 #features['Pp'],features['Pa'],features['Ps'],features['Qa'],features['Qp'],features['Qs']=LMtext.fittoSpikeM(volumeperHour[:i])
-                for tweet in tweetlist[i]:
+                #for tweet in tweetlist[i]:
                     # Userfollowers_count+=tweet['Userfollowers_count']
                     # PositiveScoer+=tweet['PositiveScoer']
                     # Smile+=tweet['Smile']
@@ -153,7 +156,7 @@ for root, dirs, files in list_dirs:
                     # Userverified+=tweet['Userverified']
                     # Menstion+=tweet['Menstion']
                     # UrlRank+=tweet['UrlRank']
-                    UrlRankIn5000+=tweet['UrlRankIn5000']
+                    #UrlRankIn5000+=tweet['UrlRankIn5000']
                     # Userfriends_count+=tweet['Userfriends_count']
                     # NumPhotos+=tweet['NumPhotos']
                     # NumChar+=tweet['NumChar']
@@ -163,7 +166,7 @@ for root, dirs, files in list_dirs:
                     # ContainNEWS+=tweet['ContainNEWS']
                     # Isretweet+=tweet['Isretweet']
                     # creditScore+=tweet['creditScore']
-                    DebunkingWords+=tweet['DebunkingWords']
+                    #DebunkingWords+=tweet['DebunkingWords']
 
 
                 # features['Userfollowers_count']=Userfollowers_count/float(volume)
@@ -172,8 +175,8 @@ for root, dirs, files in list_dirs:
                 # features['UserJoin_date']=UserJoin_date/float(volume)
                 # features['NumPositiveWords']=NumPositiveWords/float(volume)
                 # features['You']=You/float(volume)
-                features['UrlRankIn5000']=UrlRankIn5000/float(volume)
-                features['DebunkingWords']=DebunkingWords/float(volume)
+                #features['UrlRankIn5000']=UrlRankIn5000/float(volume)
+                #features['DebunkingWords']=DebunkingWords/float(volume)
                 # if numUrls!=0:
                 #     features['WotScore']=WotScore/float(numUrls)
                 #     features['UrlRank']=UrlRank/float(numUrls)

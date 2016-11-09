@@ -149,7 +149,7 @@ def logistic_regression_classifier(train_x, train_y):
 # Random Forest Classifier
 def random_forest_classifier(train_x, train_y):
     from sklearn.ensemble import RandomForestClassifier
-    model = RandomForestClassifier(n_estimators=8)
+    model = RandomForestClassifier(n_estimators=200,n_jobs=4,random_state=0)
     model.fit(train_x, train_y)
     return model
 
@@ -171,10 +171,11 @@ def gradient_boosting_classifier(train_x, train_y):
 
 
 # SVM Classifier
-def svm_classifier(train_x, train_y):
+def svm_classifier(train_x, train_y,C):
     from sklearn.svm import SVC
     #model = SVC(kernel='rbf', probability=True)
-    model = SVC(kernel='rbf',C=2,random_state=0)
+    model = SVC(kernel='poly',C=C,random_state=0,gamma=0.1)
+
     model.fit(train_x, train_y)
     return model
 
@@ -197,9 +198,9 @@ def svm_cross_validation(train_x, train_y):
 # y = [[0, 1], [1, 1]]
 def MLP(train_x, train_y):
 
-    clf = MLPClassifier(activation='relu', algorithm='adam', alpha=1,
+    clf = MLPClassifier(activation='relu', algorithm='adam', alpha=0.1,
            batch_size='auto', beta_1=0.9, beta_2=0.999, early_stopping=False,
-           epsilon=1e-08, hidden_layer_sizes=([8,8]), learning_rate='constant',
+           epsilon=1e-08, hidden_layer_sizes=([15,15]), learning_rate='constant',
            learning_rate_init=0.01, max_iter=500, momentum=0.9,
            nesterovs_momentum=True, power_t=0.5, random_state=1, shuffle=True,
            tol=0.0001, validation_fraction=0.1, verbose=False,
@@ -229,13 +230,13 @@ def multisvm(testevent,eventids,listofrumorevents,listofnewsevents,classifier):
     predict = modelclf.predict(x_test)
 
     accuracy = metrics.accuracy_score(y_test, predict)
-    print (str(testevent)+'    '+classifier+' accuracy: %.2f%%' % (100 * accuracy))
+    print (str(testevent)+'    '+classifier+' accuracy: %.2f%%' % (200 * accuracy))
 
 # score = metrics.accuracy_score(clf.predict((x_test)), (y_test))
 # print(score)
 
 
-outputFile=path.Featurepath+'tweetscore.txt'
+outputFile=path.Featurepath+'tweetscoreRF.txt'
 if __name__ == '__main__':
     times=10
     test_classifiers = [  'MLP',  'LR', 'RF', 'DT', 'GBDT','SVM']
@@ -256,6 +257,9 @@ if __name__ == '__main__':
 
     print ('reading training and testing data...'  )
     listofrumorevents,listofnewsevents = read_data()
+    #print(listofrumorevents)
+    corretresult=0.0
+    totllyresult=0.0
     xlist=[]
     ylist=[]
     indeslixt=[]
@@ -264,9 +268,10 @@ if __name__ == '__main__':
 
     tweetresult={}
     lenofpiece=int(len(indeslixt)/times+0.5)
-
+    recall=0
     for time in range(times):
-
+        numofnew=0
+        numofrumor=0
         listofPara=list()
         listofresult=list()
 
@@ -275,10 +280,9 @@ if __name__ == '__main__':
         tweetIDtest=[]
 
         selecttextevent=indeslixt[time*lenofpiece: time*lenofpiece+lenofpiece]
-
         for trainEventID in indeslixt:
             isRumor=-1
-            if trainEventID in listofrumorevents:
+            if trainEventID in listofrumorevents :
                 event=listofrumorevents[trainEventID]
                 isRumor=1
             else:
@@ -287,7 +291,9 @@ if __name__ == '__main__':
                 raise NameError(trainEventID)
 
             for tweet in event :
-                if trainEventID not in selecttextevent:
+                if int(tweet['tweetid']) %50!=0:
+                    continue
+                if trainEventID not in selecttextevent and trainEventID in indeslixt:
                     # tweetIDsqe.append(tweet['tweetid'])
                     # tweetID[tweet['tweetid']]=isRumor
                     featureslist = getFeauture(tweet)
@@ -298,21 +304,40 @@ if __name__ == '__main__':
                     tweetIDtest.append(tweet['tweetid'])
                     listofParatest.append(featureslist)
                     listofresulttest.append(isRumor)
-        scaler = StandardScaler()
-        scaler.fit(listofPara)
-        listofPara = scaler.transform(listofPara)
-        listofParatest = scaler.transform(listofParatest)
-        modelclf = classifiers['MLP'](listofPara, listofresult)
+                    if isRumor ==1:
+                        numofrumor+=1
+                    else:
+                        numofnew+=1
+        # scaler = StandardScaler()
+        # scaler.fit(listofPara)
+        # listofPara = scaler.transform(listofPara)
+        # listofParatest = scaler.transform(listofParatest)
+        # modelclf = classifiers['SVM'](listofPara, listofresult,C=2)
+        modelclf = classifiers['RF'](listofPara, listofresult)
+
         predict = modelclf.predict(listofParatest)
         accuracy = metrics.accuracy_score(listofresulttest, predict)
-        print ('accuracy: %.4f%%' % (100 * accuracy))
+        # recall += metrics.recall_score(listofresulttest, predict)
 
+        print ('accuracy: %.4f%%' % (100 * accuracy))
+        for i in range(len(featuresdecription.Allfeaturesingle)):
+            print(featuresdecription.Allfeaturesingle[i])
+
+        for i in range(len(featuresdecription.Allfeaturesingle)):
+            print(modelclf.feature_importances_[i])
+
+        corretresult+=accuracy*len(listofParatest)
+        totllyresult+=len(listofParatest)
         for num in range(len(tweetIDtest)):
             tweetresult[tweetIDtest[num]]=str(predict[num])
         #print(tweetresult)
-    with open(outputFile, mode='w') as writer:
-        JSON=json.dumps(tweetresult)
-        writer.write(JSON + '\n')
+    print(corretresult/totllyresult)
+    print(recall)
+
+
+    # with open(outputFile, mode='w') as writer:
+    #     JSON=json.dumps(tweetresult)
+    #     writer.write(JSON + '\n')
 
 
     # for i in range(0,len(index),int(len(index)/4)):

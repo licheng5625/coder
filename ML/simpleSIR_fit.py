@@ -20,8 +20,8 @@ def diff_eqs(INP,t,para):
 def getdata(p,timeEND):
     t_start = 1.0; t_end = timeEND; t_inc = 1.0
     t_range = np.arange(t_start, t_end+t_inc, t_inc)
-    INPUT=p[:2]
-    RES = spi.odeint(diff_eqs,INPUT,t_range,args=(p[2:],))
+    INPUT=p[2:]
+    RES = spi.odeint(diff_eqs,INPUT,t_range,args=(p[:2],))
     #print(RES)
     return RES
 
@@ -40,35 +40,36 @@ def fitSIS(dat):
         for i in range(4-lentgh):
             dat=np.append(dat,0)
     else:
-        dat=dat/dat[-1]
+        # dat=dat/dat[-1]
         if lentgh<4:
             lastdata=dat[-1]
             for i in range(4-lentgh):
                 dat=np.append(dat,lastdata)
+        dat=dat/dat[-1]
     N=dat[-1]
     N0=dat[0]
     timeEND=len(dat)
-    x0 =  [N,N0,0,0]
+    x0 =  [0,0,N,N0]
     p = optimization.leastsq(residuals,x0, args=( dat,dat,timeEND))[0]
     return p
 
-dat=np.array(dat)
-
-p=fitSIS(dat)
-# #p=[1-0.001,0.001,1.4247,0.14286]
-print(p[2:])
-RES=getdata(p,48)
-print(RES[:,1])
-#Ploting
-pl.subplot(211)
-pl.plot(RES[:,0], '-g', label='Susceptibles')
-pl.title('Program_2_5.py')
-pl.xlabel('Time')
-pl.ylabel('Susceptibles')
-pl.subplot(212)
-pl.plot(RES[:,1], '-r', label='Infectious')
-pl.plot( dat/dat[-1], '-b', label='real Infectious')
-
-pl.xlabel('Time')
-pl.ylabel('Infectious')
-pl.show()
+# dat=np.array(dat)
+#
+# p=fitSIS(dat)
+# # #p=[1-0.001,0.001,1.4247,0.14286]
+# print(p[2:])
+# RES=getdata(p,48)
+# print(RES[:,1])
+# #Ploting
+# pl.subplot(211)
+# pl.plot(RES[:,0], '-g', label='Susceptibles')
+# pl.title('Program_2_5.py')
+# pl.xlabel('Time')
+# pl.ylabel('Susceptibles')
+# pl.subplot(212)
+# pl.plot(RES[:,1], '-r', label='Infectious')
+# pl.plot( dat/dat[-1], '-b', label='real Infectious')
+#
+# pl.xlabel('Time')
+# pl.ylabel('Infectious')
+# pl.show()

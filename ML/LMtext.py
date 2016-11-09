@@ -24,11 +24,11 @@ def residuals(p, x, y):
 def func(p):#N_max0, betaN0, nb, Sb, bgn0, prate0, pshift0
     global T
     global slope0
-    my_beta0=p[1]/p[0]
+    my_beta0=p[7]/p[6]
     (s,t)= spikeMfit.spikeM(T,
-    p[0], my_beta0, -slope0,
-    p[2], p[3],p[4],
-    p[5], p[6], p[7],p[8],p[9], p[10])
+    p[6], my_beta0, -slope0,
+    p[8], p[9],p[10],
+    p[0], p[1], p[2],p[3],p[4], p[5])
     return s
 
 #dat=pylab.loadtxt("data.txt")
@@ -42,10 +42,10 @@ def fittoSpikeM(dat):
     T = len(dat)
     N=sum(dat)
 
-    x0 =  [N*0.8,0.5,11,10,0,1,0.5,10,1,0.5,10]
+    x0 =  [1,0.5,10,1,0.5,10,N*0.8,0.5,11,10,0]
     p = optimization.leastsq(residuals,x0, args=( dat,dat))[0]
     #return p[7],p[8],p[10]
-    return p[5], p[6], p[7],p[8],p[9], p[10]
+    return p[0], p[1], p[2],p[3],p[4], p[5]
 
 # import pylab
 # dat=pylab.loadtxt("/Users/licheng5625/Downloads/spikeM/data.txt")
@@ -73,3 +73,27 @@ def fittoSpikeM(dat):
 # x0 =  np.array([0,0])
 # for p in optimization.leastsq(residuals2,x0, args=( x,y))[0]:
 #  print(p)
+def drawSpikeM(dat):
+    import pylab as pl
+
+    dat=np.array(dat)
+    lentgh=len(dat)
+    for i in range(11-lentgh):
+        dat=np.append(dat,1)
+    #print((dat))
+    global T
+    T = len(dat)
+    N=sum(dat)
+
+    x0 =  [1,0.5,10,1,0.5,10,N*0.8,0.5,11,10,0]
+    p = optimization.leastsq(residuals,x0, args=( dat,dat))[0]
+    s=func(p)
+    pl.plot(s, '-r', label='SpikeM')
+#
+    pl.plot( dat , '-b', label='real Volum')
+    # pl.legend(loc='upper center')
+    pl.legend()
+
+    pl.xlabel('Time(Hour)')
+    pl.ylabel('#Tweet')
+    pl.show()

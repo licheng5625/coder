@@ -120,7 +120,7 @@ def spikeM(
         for i in range(nc,n+1): # i.e, from zero to n
             # Si = exo(i, nc, Sc);
             # dsum += ( dB[i] + Si ) * decay_pl(n+1-i, beta0, slope)
-            St = exo(i, nc, Sc)+qperiod(n,Qp, Qa, Qs)
+            St = exo(i, nc, Sc)+qperiod(i,Qp, Qa, Qs)
             dsum += ( dB[i] + St ) * decay_pl(n+1-i, beta0, slope)
         P_n1 = period(n+1, Pp, Pa, Ps);
         dB[n+1] = P_n1 * (U[n] * dsum + bgnoise)    

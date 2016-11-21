@@ -89,7 +89,7 @@ userlist=dict()
 
 datafolder=path.Featurepath+'news/'
 descriptionFile=path.Featurepath+'descriptionNews.txt'
-outputFile=path.Featurepath+'URLsRumors.txt'
+outputFile=path.Featurepath+'URLsRumors2.txt'
 outputFloader=path.Featurepath+'rumors/'
 
     #return json.loads(jsontext)["items_html"]

@@ -60,8 +60,11 @@ for root, dirs, files in list_dirs:
             with open(descriptionFile,encoding='utf-8', mode='r')as Seenlist2:
                 for line in Seenlist2:
                     data=json.loads(line)
+                    mytweet=None
                     if data['tweetsQueryInGoogle'] ==title:
                         mytweet=data
+                if mytweet==None:
+                    continue
             print(title)
             eventID=mytweet['eventID']
             event=eventdict[eventID]

@@ -57,7 +57,13 @@ with open(  path.datapath+"RumorsLIST.txt",encoding="utf-8", mode='r') as Seenli
 
 
 def getTimefromJson(jsontext):
-    t = datetime.datetime.fromtimestamp((json.loads(jsontext)['created_at']/1000))
+    try:
+        t = datetime.datetime.fromtimestamp((json.loads(jsontext)['created_at']/1000))
+    except:
+        timetext=json.loads(jsontext)['created_at']
+        timetext=timetext.replace(' 24:',' 23:')
+        t = datetime.datetime.strptime(timetext,'%a %b %d %H:%M:%S +0000 %Y')
+
     fmt="%Y-%m-%d-%H"
     return  t#.strftime(fmt)
 
@@ -123,7 +129,7 @@ for root, dirs, files in list_dirs:
     for file in files:
         if ('.txt'in file):#and title.replace(' ','_') in file):
             title=file.replace('_',' ').replace('.txt','')
-            if (title in checklist):
+            if ('muni' not in title):
                 continue
             with open('/Users/licheng5625/PythonCode/masterarbeit/data/webpagefortwitter/Tweet_JSON/descriptionNews.txt', mode='r')as Seenlist2:
                 for line in Seenlist2:
@@ -152,7 +158,9 @@ for root, dirs, files in list_dirs:
                 for x in range(len(Volume)):
                     Volume2[x]=float(Volume2[x])/Volume[x]
                 return Volume2
-            rootJSONMap=rootmap.map(lambda line2:(getTimefromJson(line2),1)).filter(lambda v1:v1[0]>=begindate).filter(lambda v1:v1[0]<=enddate).map(lambda v1:(getHours(begindate,v1[0]),v1[1])).reduceByKey(lambda v1,v2:v1+v2).sortByKey(True,1)
+            # rootJSONMap=rootmap.map(lambda line2:(getTimefromJson(line2),1)).filter(lambda v1:v1[0]>=begindate).filter(lambda v1:v1[0]<=enddate).map(lambda v1:(getHours(begindate,v1[0]),v1[1])).reduceByKey(lambda v1,v2:v1+v2).sortByKey(True,1)
+            rootJSONMap=rootmap.map(lambda line2:(getTimefromJson(line2),1)).map(lambda v1:(getHours(begindate,v1[0]),v1[1])).reduceByKey(lambda v1,v2:v1+v2).sortByKey(True,1)
+
             # map3 =rootmap.map(lambda line:(getTimefromJson(line),1)).reduceByKey(lambda v1,v2:v1+v2)
             #TweetNum=map3.filter(lambda v1:v1[0]>=begindate).filter(lambda v1:v1[0]<=enddate).map(lambda v1:(getHours(begindate,v1[0]),v1[1])).reduceByKey(lambda v1,v2:v1+v2)
             # output=dict()
@@ -163,30 +171,33 @@ for root, dirs, files in list_dirs:
             #     writer.write(JSON + '\n')
 
 
+            TweetVolumeSUM = [0 for n in range(getHours(begindate,enddate))]
             TweetVolume = [0 for n in range(getHours(begindate,enddate))]
-           # percentOfUrl = [0 for n in range(getHours(begindate,enddate))]
 
-            # dates=rootJSONMap.map(lambda v:v[0]).collect()
-            # times=rootJSONMap.map(lambda v:v[1]).collect()
+            dates=rootJSONMap.map(lambda v:v[0]).collect()
+            times=rootJSONMap.map(lambda v:v[1]).collect()
             outputs=rootJSONMap.collect()
-            for x  in range(len(TweetVolume)):
+            for x  in range(len(TweetVolumeSUM)):
                 for output in outputs:
                     if output[0]<=x:
+                        TweetVolumeSUM[x]+=output[1]
+                    if output[0]==x:
                         TweetVolume[x]+=output[1]
-            print(TweetVolume)
+            Volstr='['
+            for tweetvo in TweetVolume:
+                Volstr+=str(tweetvo)+','
+            print(Volstr)
             with open('/Users/licheng5625/PythonCode/masterarbeit/data/webpagefortwitter/Tweet_JSON/data.txt', mode='w') as writer:
                 #for vol in TweetVolume:
-                writer.write(str(TweetVolume)+'\n')
+                writer.write(str(TweetVolumeSUM)+'\n')
 
 
 
 ##画图表
             # import matplotlib.pyplot as plt
-            # dates=None
-            # times=None
             # plt.plot(dates, times)
             # plt.xlabel('Hours')
             # plt.ylabel('#Tweets')
             # plt.title(title)
-            # plt.savefig('/Users/licheng5625/PythonCode/masterarbeit/data/webpagefortwitter/Tweet_JSON/picture/News/'+title+'.png')
+            # plt.savefig('/Users/licheng5625/PythonCode/masterarbeit/data/webpagefortwitter/Tweet_JSON/picture/Rumors/'+title+'2.png')
             # plt.close('all')

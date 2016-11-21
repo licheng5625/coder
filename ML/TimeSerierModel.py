@@ -12,12 +12,12 @@ from sklearn.neural_network import MLPClassifier
 from scipy import stats
 from sklearn.preprocessing import StandardScaler
 
-with open(path.Featurepath+'featuresRumorsTimeSerior.txt', mode='r') as writer:
+with open(path.Featurepath+'featuresRumorsTimeSerior130.txt', mode='r') as writer:
     for line in writer:
         JSON=json.loads(line)
         listofrumor.append(JSON)
 
-with open(path.Featurepath+'featuresNewsTimeSerior.txt', mode='r') as writer:
+with open(path.Featurepath+'featuresNewsTimeSerior130.txt', mode='r') as writer:
     for line in writer:
         JSON=json.loads(line)
         listofnews.append(JSON)
@@ -25,16 +25,21 @@ with open(path.Featurepath+'featuresNewsTimeSerior.txt', mode='r') as writer:
 
 def random_forest_classifier(train_x, train_y):
     from sklearn.ensemble import RandomForestClassifier
-    model = RandomForestClassifier(n_estimators=200,random_state=1,n_jobs=1)
+    model = RandomForestClassifier(n_estimators=350,random_state=0,n_jobs=4)
+    model.fit(train_x, train_y)
+    return model
+def decision_tree_classifier(train_x, train_y):
+    from sklearn import tree
+    model = tree.DecisionTreeClassifier(random_state=0)
     model.fit(train_x, train_y)
     return model
 
 
 def MLP_classifier(train_x, train_y):
-    clf = MLPClassifier(activation='relu', algorithm='adam', alpha=0.001,
-               batch_size='auto', beta_1=0.9, beta_2=0.999, early_stopping=False,
-               epsilon=1e-08, hidden_layer_sizes=([10,10]), learning_rate='constant',
-               learning_rate_init=0.01, max_iter=300, momentum=0.9,
+    clf = MLPClassifier(activation='relu', algorithm='adam', alpha=0.0001,
+               batch_size='auto', beta_1=0.9, beta_2=0.999, early_stopping=True,
+               epsilon=1e-08, hidden_layer_sizes=([50,50]), learning_rate='constant',
+               learning_rate_init=0.01, max_iter=3000, momentum=0.9,
                nesterovs_momentum=True, power_t=0.5, random_state=0, shuffle=True,
                 validation_fraction=0.1, verbose=False,
                warm_start=False)
@@ -42,7 +47,7 @@ def MLP_classifier(train_x, train_y):
     return clf
 
 def SVM_classifier(train_x, train_y):
-    clf = svm.SVC(C=3,random_state=0)
+    clf = svm.SVC(C=1,random_state=0)
     clf.fit(train_x, train_y)
     return clf
 featuresIndes=[]
@@ -53,11 +58,11 @@ def getFeauture(tweet,maxtime,indexfeatureslist):
     allfeaturelist=[]
     index=[]
 
-    # index.append('F'+str(maxtime))
-    for i in range(maxtime+1):
-        index.append('F'+str(i))
-        if i !=0:
-            index.append('S'+str(i))
+    index.append('F'+str(maxtime))
+    # for i in range(maxtime+1):
+    #     index.append('F'+str(i))
+        # if i !=0:
+        #     index.append('S'+str(i))
     for key in index:
         featureslist=[]
         #for featureIndex in featuresdecription.AllfeaturefullOld:#
@@ -86,19 +91,30 @@ indeslixt=[]
 # random.seed(0)
 # random.shuffle(indeslixt)
 with open(path.Featurepath+'indexshuffled.txt',encoding='utf-8',mode='r') as writer:
-     indeslixt=json.loads(writer.read())
+    indeslixt=json.loads(writer.read())
+    dsdsds=[]
+    for news in listofnews:
+        dsdsds.append(news['eventID'])
+    for news in listofrumor:
+        dsdsds.append(news['eventID'])
+
+    for index in indeslixt:
+        if index not in dsdsds:
+            print(index)
 #print(indeslixt[:5])
 
-pickedFeatures=featuresdecription.pickfeature
-#pickedFeatures=featuresdecription.Allfeaturefull
-
+# pickedFeatures=featuresdecription.TS_SVM+['UserJoin_date']
+pickedFeatures=featuresdecription.TS_SVM
+# pickedFeatures=['ContainNEWS']
 times=10
 lenofpiece=int(len(indeslixt)/times+0.5)
 
-for maxtime in range(48,49):
-    scores=[]
-    if maxtime%3!=0:
+for maxtime in range(1,49):
+    if maxtime not in [1,6,12,18,24,30,36,42,48]:
         continue
+    scores=[]
+    # if maxtime%6!=0 and maxtime!=1:
+    #     continue
     for time in range(times):
         listofPara=list()
         listofresult=list()
@@ -107,6 +123,8 @@ for maxtime in range(48,49):
         listofresulttest=list()
 
         for rumor in listofrumor:
+            if rumor['eventID'] not in indeslixt:
+                continue
             if rumor['eventID'] not in  indeslixt[time*lenofpiece: time*lenofpiece+lenofpiece]:
                 listofPara.append(getFeauture(rumor,maxtime,pickedFeatures))
                 listofresult.append(1)
@@ -115,6 +133,9 @@ for maxtime in range(48,49):
                 listofresulttest.append(1)
 
         for news in listofnews:
+            if news['eventID'] not in indeslixt:
+                continue
+
             if news['eventID'] not in  indeslixt[time*lenofpiece: time*lenofpiece+lenofpiece]:
                 listofPara.append(getFeauture(news,maxtime,pickedFeatures))
                 listofresult.append(-1)
@@ -125,12 +146,14 @@ for maxtime in range(48,49):
         scaler.fit(listofPara)
         listofPara = scaler.transform(listofPara)
         listofParatest = scaler.transform(listofParatest)
+        # clf =    decision_tree_classifier(listofPara, listofresult)
+        clf = SVM_classifier(listofPara, listofresult)
+        # clf=MLP_classifier(listofPara, listofresult)
 
-        #clf = SVM_classifier(listofPara, listofresult)
-        #clf=MLP_classifier(listofPara, listofresult)
-
-        clf=random_forest_classifier(listofPara, listofresult)
+        # clf=random_forest_classifier(listofPara, listofresult)
         score = metrics.accuracy_score(clf.predict(listofParatest), (listofresulttest))
+        # score = metrics.recall_score(clf.predict(listofParatest), (listofresulttest))
+
         scores.append(score)
     avg=sum(scores) / float(len(scores))
     print(str(avg))

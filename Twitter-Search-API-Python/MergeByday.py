@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 import matplotlib
 
-import path
+import mypath as path
 findspark.init(spark_home='/Applications/spark-1.6.1')
 
 from pyspark import SparkContext, SparkConf

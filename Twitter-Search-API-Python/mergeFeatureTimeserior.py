@@ -2,14 +2,14 @@ import mypath as path
 import json
 import os
 import featuresdecription
-# outputFile=path.Featurepath+'featuresNewsTimeSeriorCreditMerged.txt'
-# inputFile=path.Featurepath+'featuresNewsTimeSerior.txt'
-# mergeFile=path.Featurepath+'featuresNewsTimeSeriorSIR.txt'
-outputFile=path.Featurepath+'featuresRumorsTimeSeriorCreditMerged.txt'
-inputFile=path.Featurepath+'featuresRumorsTimeSerior.txt'
-mergeFile=path.Featurepath+'featuresRumorsTimeSeriorSIR.txt'
+outputFile=path.Featurepath+'featuresNewsTimeSeriorCreditMerged.txt'
+inputFile=path.Featurepath+'featuresNewsTimeSerior.txt'
+mergeFile=path.Featurepath+'featuresNewsTimeSeriorSIR.txt'
+# outputFile=path.Featurepath+'featuresRumorsTimeSeriorCreditMerged.txt'
+# inputFile=path.Featurepath+'featuresRumorsTimeSerior.txt'
+# mergeFile=path.Featurepath+'featuresRumorsTimeSerior.txt'
 
-mergefeatures=['beta','gamma']
+mergefeatures=['SEIZIndex']#'beta','gamma','B','b','l','e','p','Pp','Pa','Ps','Qp','Qa','Qs']
 
 #mergefeatures=featuresdecription.featureTypes['spikM']#['creditScore']
 
@@ -43,8 +43,13 @@ with open(inputFile,encoding='utf-8', mode='r')as Seenlist2:
         for feature in oldfeature.keys():
             mergeTweet=oldfeature[feature]
             for addfeatur in mergefeatures:
-               # print(mergeTweet .keys())
                 mergeTweet[addfeatur]=newdeature[feature][addfeatur]
+                # p=newdeature[feature]['p']
+                # B=newdeature[feature]['B']
+                # b=newdeature[feature]['b']
+                # l=newdeature[feature]['l']
+                # e=newdeature[feature]['e']
+                # mergeTweet[addfeatur]=((1-p)*B+(1-l)*b)/(p+e+1)
         if eventID in counter:
             print(counter)
         counter.add(eventID)

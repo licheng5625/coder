@@ -7,7 +7,7 @@ from abc import abstractmethod
 from urllib.parse import urlunparse
 from bs4 import BeautifulSoup
 from time import sleep
-import path
+import mypath as path
 import random
 import os
 from fake_useragent import UserAgent
@@ -58,7 +58,7 @@ class UserSearch(metaclass=ABCMeta):
                 'user-agent': None
             }
             headers['user-agent']=self.ua.random
-            req = urllib.request.Request(url, headers=headers)
+            req = urllib.request.Request(url)#, headers=headers)
             response = urllib.request.urlopen(req)
             text =response.read().decode('utf-8')
             data = json.loads(text)
@@ -187,7 +187,7 @@ class UserSearchImpl(UserSearch):
         super(UserSearchImpl, self).__init__(projectname,rate_delay, error_delay)
         self.max_tweets = max_tweets
         self.counter = 0
-        self.projeckDir=path.userrawpath+"News/NewsRawSimple2/"
+        self.projeckDir=path.userrawpath+"munich/"
     def count_tweets(self, tweets):
         return len(tweets)
     def save_tweets(self, tweets):

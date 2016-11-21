@@ -25,7 +25,7 @@ with open(path.Featurepath+'featuresNewsTimeSerior130.txt', mode='r') as writer:
 
 def random_forest_classifier(train_x, train_y):
     from sklearn.ensemble import RandomForestClassifier
-    model = RandomForestClassifier(n_estimators=350,random_state=0,n_jobs=4)
+    model = RandomForestClassifier(n_estimators=100,random_state=0,n_jobs=4)
     model.fit(train_x, train_y)
     return model
 
@@ -42,7 +42,7 @@ def MLP_classifier(train_x, train_y):
     return clf
 
 def SVM_classifier(train_x, train_y):
-    clf = svm.SVC(C=3,random_state=0)
+    clf = svm.SVC(C=1,random_state=0)
     clf.fit(train_x, train_y)
     return clf
 featuresIndes=[]
@@ -99,15 +99,17 @@ with open(path.Featurepath+'indexshuffled.txt',encoding='utf-8',mode='r') as wri
 #print(indeslixt[:5])
 
 #pickedFeatures=featuresdecription.pickfeature
-pickedFeatures=featuresdecription.Allfeaturefullstatic
+pickedFeatures=featuresdecription.TS_SVM_weibo+featuresdecription.SIR
+# SIR
+# pickedFeatures=featuresdecription.Allfeaturefull
 
 times=10
 lenofpiece=int(len(indeslixt)/times+0.5)
 
 for maxtime in range(1,49):
     scores=[]
-    # if maxtime%6!=0 and maxtime!=1:
-    #     continue
+    if maxtime not in [1,6,12,18,24,30,36,42,48]:
+        continue
     for time in range(times):
         listofPara=list()
         listofresult=list()
@@ -135,18 +137,17 @@ for maxtime in range(1,49):
             else:
                 listofParatest.append(getFeauture(news,maxtime,pickedFeatures))
                 listofresulttest.append(-1)
-        # scaler = StandardScaler()
-        # scaler.fit(listofPara)
-        # listofPara = scaler.transform(listofPara)
-        # listofParatest = scaler.transform(listofParatest)
-
-        #clf = SVM_classifier(listofPara, listofresult)
+        scaler = StandardScaler()
+        scaler.fit(listofPara)
+        listofPara = scaler.transform(listofPara)
+        listofParatest = scaler.transform(listofParatest)
+        #
+        clf = SVM_classifier(listofPara, listofresult)
         # clf=MLP_classifier(listofPara, listofresult)
 
-        clf=random_forest_classifier(listofPara, listofresult)
-        score = metrics.recall_score(clf.predict(listofParatest), (listofresulttest))
+        # clf=random_forest_classifier(listofPara, listofresult)
 
-        # score = metrics.accuracy_score(clf.predict(listofParatest), (listofresulttest))
+        score = metrics.accuracy_score(clf.predict(listofParatest), (listofresulttest))
         scores.append(score)
     avg=sum(scores) / float(len(scores))
     print(str(avg))

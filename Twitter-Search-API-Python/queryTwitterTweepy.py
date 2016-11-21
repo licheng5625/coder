@@ -1,66 +1,101 @@
 
 import time
 import tweepy
+import urllib
+import zlib
+from bs4 import BeautifulSoup
+import mypath
+import json
 
 auth = tweepy.OAuthHandler('V0dszSPR1da4exOnePoPV2spF', 'ahpHyWeiwH2ebOAIrJD3wm1NYlFyXp3JEe7uCCap5UC3qqoK7c')
 auth.set_access_token('114177663-k84mzvQyg3LVz9Fs4KGk70RveLaUtk7L1r4SfagF', 'rcg7EChRmeFemrChegWqy8jRt3tieMwHGCzvXGCd9DMk9')
 
 api = tweepy.API(auth)
 
-def execute_search(self, url,counter=0):
-        """
-        Executes a search to Twitter for the given URL
-        :param url: URL to search twitter with
-        :return: A JSON object with data from Twitter
-        """
-        counter=counter+1
-        try:
-            # Specify a user agent to prevent Twitter from returning a profile card
-            headers = {
-                'user-agent': None
-            }
-            headers['user-agent']=self.ua.random
-            req = urllib.request.Request(url, headers=headers)
-            response = urllib.request.urlopen(req)
-            data = json.loads(response.read().decode('utf-8'))
-            return data
+filename=mypath.TweetJSONpath+'usersrumors.txt'
+outfile=mypath.USerJSONpath+'UserjsonNew.txt'
+userset=set()
+with open(filename,mode='r')as er:
+    for line in er:
+        userset.add(int(line))
+def getNumberFromStr(text):
+    thou=False
+    for i in range(10):
+        substr=str(i)+'K'
+        if text.find(substr) != -1:
+            thou=True
+            break
 
-        # If we get a ValueError exception due to a request timing out, we sleep for our error delay, then make
-        # another attempt
-        except ValueError as e:
-            print(("Sleeping for %i" % self.error_delay))
-            sleep(self.error_delay)
-            if counter<5:
-                return self.execute_search(url,counter)
-            else:
-                raise BlacklistError()
+    numberstr='0123456789.'
+    tempstr=text
+    for char in text:
+        if char not in numberstr:
+            tempstr=tempstr.replace(char,'')
+    if thou:
+        return int(float(tempstr)*1000)
+    else:
+        return int(tempstr)
 
-        except urllib.error.HTTPError as e:
-            print(headers['user-agent'])
-            print(e.reason)
-            if counter<5:
-                return self.execute_search( url,counter)
-            else:
-                raise BlacklistError()
-def limit_handled(cursor):
-    while True:
-        try:
-            yield cursor.next()
-        except tweepy.RateLimitError:
-            time.sleep(2 * 60)
+def getData(username):
+        opener = urllib.request.build_opener()
+        # if len(self.header) ==0:
+        #     self._getHeader()
+        opener.addheaders =[('User-agent', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.75 Safari/537.36'),('DNT', "1"),('Accept-Language', "en-US;q=0.8,en;q=0.2"),('Accept-Encoding', "gzip, deflate, sdch")]
+        url=opener.open('https://twitter.com/'+username).read()
+        return zlib.decompress(url, 16+zlib.MAX_WBITS)
+craweduser=set()
+def saveUser(userlist):
+    for follower in api.lookup_users( user_ids=userlist):
+                user = {
+                'data-background-image': None,
+                'user_id': None,
+                'user_screen_name': None,
+                'user_name': None,
+                'followers_count': 0,
+                'location':None,
+                'friends_count':0,
+                'favourites_count':0,
+                'photos_count':0,
+                'tweets_count':0,
+                'Join_date':None,
+                'Description':None,
+                'hashtagsInDescription':list(),
+                'menstionInDescription':list(),
+                'urlsInDescription':list(),
+                'url':None,
+                'verified':False
+                }
+                timeformate='%I:%M %p - %d %b %Y'
 
-for follower in limit_handled(tweepy.Cursor(api.friends,id='114177663',count=5000).pages()):
-      print ((follower))
-# i=0
-# for follower in limit_handled(tweepy.Cursor(api.search,q = ' Ammon Bundy Rosa Parks',count=100).items()):
-#     print (follower)
-#     i=i+1
-# print(i)
+                user['user_id']=follower.id
+                user['user_screen_name']=follower.screen_name
+                user['user_name']=follower.name
+                user['followers_count']=follower.followers_count
+                user['location']=follower.location
+                user['friends_count']=follower.friends_count
+                user['favourites_count']=follower.followers_count
+                user['tweets_count']=follower.statuses_count
+                user['Join_date']=follower.created_at.strftime(timeformate)
+                user['Description']=follower.description
+                user['verified']=follower.verified
+                html=getData(follower.screen_name)
+                soup = BeautifulSoup(html,"lxml")
+                photos=soup.find("a", class_="PhotoRail-headingWithCount js-nav")
+                if photos is not None:
+                    user['photos_count']=getNumberFromStr(photos.text)
+                with open (outfile,mode='a')as reader:
+                    reader.write(json.dumps(user)+'\n')
+with open (outfile,encoding='utf-8',mode='r')as reader:
+    for line in reader:
+        user=json.loads(line)
+        craweduser.add(user['user_id'])
+tempidlist=[]
+for userid in userset:
+    if userid not in craweduser:
+        tempidlist.append(userid)
+    if len(tempidlist)==100:
+        saveUser(tempidlist)
+        tempidlist=[]
+saveUser(tempidlist)
 
 
-# pubic_tweets = api.retweeters(id='746573395030999040',count=100)
-# print(pubic_tweets)
-# for tweet in pubic_tweets:
-#     print (tweet)
-# print(len(pubic_tweets))
-# print('114177663' in pubic_tweets)

@@ -8,7 +8,7 @@ from urllib.parse import urlparse
 
 os.environ['LANG'] = 'en_US.UTF-8'
 import json
-import path
+import mypath as path
 findspark.init(spark_home='/Applications/spark-1.6.1')
 
 from pyspark import SparkContext, SparkConf
@@ -68,8 +68,12 @@ with open(  path.datapath+"RumorsLIST.txt",encoding="utf-8", mode='r') as Seenli
 
 
 def getTimefromJson(jsontext):
-    t = datetime.datetime.fromtimestamp((json.loads(jsontext)['created_at']/1000))
-
+    try:
+        t = datetime.datetime.fromtimestamp((json.loads(jsontext)['created_at']/1000))
+    except:
+        timetext=json.loads(jsontext)['created_at']
+        timetext=timetext.replace(' 24:',' 23:')
+        t = datetime.datetime.strptime(timetext,'%a %b %d %H:%M:%S +0000 %Y')
     return  t#.strftime(fmt)
 
 
@@ -86,20 +90,22 @@ def getThrowhold(sum):
 fmt="%Y-%m-%d"
 userlist=dict()
     #return json.loads(jsontext)["items_html"]
-list_dirs = os.walk(path.datapath+'/webpagefortwitter/Tweet_JSON/rumors/')
+list_dirs = os.walk(path.datapath+'/webpagefortwitter/Tweet_JSON/news/')
 countnum=0
 for root, dirs, files in list_dirs:
     for file in files:
         if ('.txt'in file):
+            if 'munich' not in file :
+                continue
             countnum=countnum+1
             print(countnum)
             datapath=root+file
-            with open('/Users/licheng5625/PythonCode/masterarbeit/data/webpagefortwitter/Tweet_JSON/description.txt', mode='r')as Seenlist2:
+            with open('/Users/licheng5625/PythonCode/masterarbeit/data/webpagefortwitter/Tweet_JSON/descriptionNews.txt', mode='r')as Seenlist2:
                 for line in Seenlist2:
                     data=json.loads(line)
                     print(data['tweetFile'])
                     print(datapath)
-                    if data['tweetFile']== datapath:
+                    if data['tweetsQueryInGoogle'] in file:
                         mytweet=data
                         break
             print(mytweet['tweetsQueryInGoogle'])
@@ -112,13 +118,14 @@ for root, dirs, files in list_dirs:
 
 
             rootJSONMap=rootmap.map(lambda line2:(getTimefromJson(line2),json.loads(line2))).filter(lambda v1:v1[0]>=begindate).filter(lambda v1:v1[0]<=enddate)
-            rootJSONMap=rootJSONMap.filter(lambda v:len(v[1]['urls'])>0).flatMap(lambda line:(line[1]['urls'])).map(lambda v:(unshortUrl.unshorten_url(v),1)).reduceByKey(lambda v1,v2:v1+v2).map(lambda v:v[0]).collect()
+            rootJSONMap=rootJSONMap.filter(lambda v:len(v[1]['urls'])>0).flatMap(lambda line:(line[1]['urls'])).map(lambda v:(v,unshortUrl.unshorten_url(v))).collect()#.reduceByKey(lambda v1,v2:v1+v2).map(lambda v:v[0]).collect()
             #print(rootJSONMap)
 #             for usr in rootJSONMap.collect():
 #                 userlist[usr[1]]=usr[0]
-            with open(path.datapath+'/webpagefortwitter/Tweet_JSON/'+'URLsRumors.txt', mode='a')as Seenlist2:
+            with open(path.datapath+'/webpagefortwitter/Tweet_JSON/'+'URLsNews2.txt', mode='a')as Seenlist2:
                 for user in rootJSONMap:
-                    Seenlist2.write(user+'\n')
+                    texturl=json.dumps(user)
+                    Seenlist2.write(texturl+'\n')
 
 
 

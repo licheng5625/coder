@@ -14,12 +14,12 @@ from sklearn.neural_network import MLPClassifier
 from scipy import stats
 from sklearn.preprocessing import StandardScaler
 
-with open(path.Featurepath+'featuresRumorsTimeSerior.txt', mode='r') as writer:
+with open(path.Featurepath+'featuresRumorsTimeSerior130.txt', mode='r') as writer:
     for line in writer:
         JSON=json.loads(line)
         listofrumor.append(JSON)
 
-with open(path.Featurepath+'featuresNewsTimeSerior.txt', mode='r') as writer:
+with open(path.Featurepath+'featuresNewsTimeSerior130.txt', mode='r') as writer:
     for line in writer:
         JSON=json.loads(line)
         listofnews.append(JSON)
@@ -27,7 +27,7 @@ with open(path.Featurepath+'featuresNewsTimeSerior.txt', mode='r') as writer:
 
 def random_forest_classifier(train_x, train_y):
     from sklearn.ensemble import RandomForestClassifier
-    model = RandomForestClassifier(n_estimators=8,random_state=0)
+    model = RandomForestClassifier(n_estimators=10,random_state=1)
     model.fit(train_x, train_y)
     return model
 
@@ -111,10 +111,10 @@ for maxtime in range(48,49):
                 else:
                     listofParatest.append(getFeauture(news,maxtime,[feature]))
                     listofresulttest.append(-1)
-            scaler = StandardScaler()
-            scaler.fit(listofPara)
-            listofPara = scaler.transform(listofPara)
-            listofParatest = scaler.transform(listofParatest)
+            # scaler = StandardScaler()
+            # scaler.fit(listofPara)
+            # listofPara = scaler.transform(listofPara)
+            # listofParatest = scaler.transform(listofParatest)
 
             # clf = SVM_classifier(listofPara, listofresult)
             #clf=MLP_classifier(listofPara, listofresult)

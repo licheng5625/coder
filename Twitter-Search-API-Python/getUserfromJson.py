@@ -8,7 +8,7 @@ os.environ['LC_ALL'] = 'en_US.UTF-8'
 
 os.environ['LANG'] = 'en_US.UTF-8'
 import json
-import path
+import mypath as path
 findspark.init(spark_home='/Applications/spark-1.6.1')
 
 from pyspark import SparkContext, SparkConf
@@ -67,7 +67,12 @@ with open(  path.datapath+"RumorsLIST.txt",encoding="utf-8", mode='r') as Seenli
 
 
 def getTimefromJson(jsontext):
-    t = datetime.datetime.fromtimestamp((json.loads(jsontext)['created_at']/1000))
+    try:
+        t = datetime.datetime.fromtimestamp((json.loads(jsontext)['created_at']/1000))
+    except:
+        timetext=json.loads(jsontext)['created_at']
+        timetext=timetext.replace(' 24:',' 23:')
+        t = datetime.datetime.strptime(timetext,'%a %b %d %H:%M:%S +0000 %Y')
 
     return  t#.strftime(fmt)
 
@@ -90,17 +95,20 @@ countnum=0
 for root, dirs, files in list_dirs:
     for file in files:
         if ('.txt'in file):
+            if 'mun' not in file:
+                continue
             countnum=countnum+1
             print(countnum)
             datapath=root+file
+            mytweet=None
+            title=file.replace('.txt','')
             with open('/Users/licheng5625/PythonCode/masterarbeit/data/webpagefortwitter/Tweet_JSON/descriptionNews.txt', mode='r')as Seenlist2:
                 for line in Seenlist2:
                     data=json.loads(line)
-                    #print(data['tweetFile'])
-                    #print(datapath)
-                    if data['tweetFile']== datapath:
+                    if data['tweetsQueryInGoogle'] ==title:
                         mytweet=data
-                        break
+            if mytweet==None:
+                continue
             print(file)
             print(data['tweetsQueryInGoogle'])
 
@@ -124,24 +132,24 @@ with open(path.USerJSONpath+'User_JSON.txt', mode='r')as Seenlist2:
             userdict[user['user_id']]=user
 
 
-with open(path.USerJSONpath+'simple_News_UserJson.txt', mode='r')as Seenlist2:
-        for line in Seenlist2:
-            user=json.loads(line)
-            usersimple[int(user['user_id'])]=user
-            # print(int(user['user_id']))
-            # print(12564162 in usersimple.keys())
-
-with open(path.USerJSONpath+'simple_News_UserJson2.txt', mode='r')as Seenlist3:
-        for line in Seenlist3:
-            user=json.loads(line)
-            usersimple[int(user['user_id'])]=user
+# with open(path.USerJSONpath+'simple_News_UserJson.txt', mode='r')as Seenlist2:
+#         for line in Seenlist2:
+#             user=json.loads(line)
+#             usersimple[int(user['user_id'])]=user
+#             # print(int(user['user_id']))
+#             # print(12564162 in usersimple.keys())
+#
+# with open(path.USerJSONpath+'simple_News_UserJson2.txt', mode='r')as Seenlist3:
+#         for line in Seenlist3:
+#             user=json.loads(line)
+#             usersimple[int(user['user_id'])]=user
             #print(12564162 in usersimple.keys())
 
 
-with open('/Users/licheng5625/Downloads/simple_News_UserJson.txt', mode='r')as Seenlist4:
-        for line in Seenlist4:
-            user=json.loads(line)
-            usersimple[int(user['user_id'])]=user
+# with open('/Users/licheng5625/Downloads/simple_News_UserJson.txt', mode='r')as Seenlist4:
+#         for line in Seenlist4:
+#             user=json.loads(line)
+#             usersimple[int(user['user_id'])]=user
             #print(12564162 in usersimple.keys())
 
 #
@@ -160,7 +168,7 @@ with open(path.datapath+'/webpagefortwitter/Tweet_JSON/'+'usersnews.txt', mode='
 
         if (int(user) not in userdict.keys() ) and (  int(user) !=2243030700):#and  (int(user) not in usersimple.keys()):
             #Seenlist22.write(str(user)+'	'+usersimple[int(user)]['screen_name']+'\n')
-            Seenlist22.write(json.dumps(usersimple[int(user)])+'\n')
+            Seenlist22.write(str(user)+'\n')
             #Seenlist22.write(str(user)+'\n')
 
 

@@ -14,12 +14,12 @@ from sklearn.neural_network import MLPClassifier
 from scipy import stats
 from sklearn.preprocessing import StandardScaler
 
-with open(path.Featurepath+'featuresRumorsTimeSerior.txt', mode='r') as writer:
+with open(path.Featurepath+'featuresRumorsTimeSerior130.txt', mode='r') as writer:
     for line in writer:
         JSON=json.loads(line)
         listofrumor.append(JSON)
 
-with open(path.Featurepath+'featuresNewsTimeSerior.txt', mode='r') as writer:
+with open(path.Featurepath+'featuresNewsTimeSerior130.txt', mode='r') as writer:
     for line in writer:
         JSON=json.loads(line)
         listofnews.append(JSON)
@@ -27,7 +27,7 @@ with open(path.Featurepath+'featuresNewsTimeSerior.txt', mode='r') as writer:
 
 def random_forest_classifier(train_x, train_y):
     from sklearn.ensemble import RandomForestClassifier
-    model = RandomForestClassifier(n_estimators=10,random_state=1)
+    model = RandomForestClassifier(n_estimators=350,random_state=0,n_jobs=4)
     model.fit(train_x, train_y)
     return model
 
@@ -92,12 +92,13 @@ with open(path.Featurepath+'indexshuffled.txt',encoding='utf-8',mode='r') as wri
 pickedFeatures=featuresdecription.Allfeaturefull
 times=10
 lenofpiece=int(len(indeslixt)/times+0.5)
-with open(path.Featurepath+"rankedfeatures_importance.csv",encoding='utf-8', mode='w') as csvfile:
+with open(path.Featurepath+"rankedfeatures_importance_1302.csv",encoding='utf-8', mode='w') as csvfile:
     writermix = csv.DictWriter(csvfile, fieldnames=['time']+pickedFeatures)
     writermix.writeheader()
-
+    resultovertime={}
     for maxtime in range(1,49):
-
+        if maxtime not in [1,6,12,24,48]:
+            continue
         result={}
          # 1---48 hors
         scores=[]
@@ -125,10 +126,10 @@ with open(path.Featurepath+"rankedfeatures_importance.csv",encoding='utf-8', mod
                 else:
                     listofParatest.append(getFeauture(news,maxtime,pickedFeatures))
                     listofresulttest.append(-1)
-            scaler = StandardScaler()
-            scaler.fit(listofPara)
-            listofPara = scaler.transform(listofPara)
-            listofParatest = scaler.transform(listofParatest)
+            # scaler = StandardScaler()
+            # scaler.fit(listofPara)
+            # listofPara = scaler.transform(listofPara)
+            # listofParatest = scaler.transform(listofParatest)
 
         # clf = SVM_classifier(listofPara, listofresult)
         #clf=MLP_classifier(listofPara, listofresult)
@@ -149,8 +150,35 @@ with open(path.Featurepath+"rankedfeatures_importance.csv",encoding='utf-8', mod
         rankedresult={}
         for key in sortkeys:
             rankedresult [key]=i
+            try:
+                resultovertime[key]+=i
+            except :
+                resultovertime[key]=i
             i+=1
         #rankedfeature=results
         results['time']=maxtime
         writermix.writerow(rankedresult)
+        output=''
+        counter=0
+        for key in sortkeys:
+            counter+=1
+            output+='\''+key+'\''+','
+        print(output)
+         #writermix.writerow(results)
 
+sortkeys=sorted(resultovertime, key=resultovertime.__getitem__,reverse=False)
+maxnum=26
+counter=0
+output=''
+for key in sortkeys:
+    counter+=1
+    output+='\''+key+'\''+','
+    # if counter==26:
+    #     break
+print(output)
+output=''
+
+for key in sortkeys:
+    counter+=1
+    output+='\''+key+'\''+','
+print(output)

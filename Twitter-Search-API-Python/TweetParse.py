@@ -1,5 +1,5 @@
 from bs4 import BeautifulSoup
-import path
+import mypath as path
 import datetime
 import json
 import findspark
@@ -132,7 +132,9 @@ def parse_tweets(items_html):
 
             tweets.append(tweet)
         return tweets
-test=True
+def selectone(v1,v2):
+    return v1
+test=False
 
 if test:
 
@@ -140,7 +142,7 @@ if test:
     sc = SparkContext(conf=conf)
 
 
-    list_dirs = os.walk(path.datapath+'/webpagefortwitter/Tweet_RAW/NewsBBC/')
+    list_dirs = os.walk(path.datapath+'/webpagefortwitter/Tweet_RAW/rumorsnopes/')
     for root, dirs, files in list_dirs:
         for d in dirs:
 
@@ -149,7 +151,7 @@ if test:
             datapath=folder+'/*.txt'
             wordCounts = sc.textFile(datapath).flatMap(lambda doc: parse_tweets(getHtmlfromJson(doc)))#.flatMap(lambda tweet: parse_tweets(tweet))#.reduceByKey(lambda v1,v2:v1 +v2)
             for tweet in wordCounts.collect():
-                with open( path.TweetJSONpath+'newsBBC/'+d+'.txt', encoding='utf-8', mode='a') as Seenlist:
+                with open( path.TweetJSONpath+'rumorsnopes/'+d+'.txt', encoding='utf-8', mode='a') as Seenlist:
                     JSON = json.dumps(tweet, ensure_ascii=False)
                     Seenlist.write(JSON + '\n')
 else:
@@ -160,9 +162,10 @@ else:
     conf = SparkConf().setAppName("Spark Count")
     sc = SparkContext(conf=conf)
 
-    d='halfbro'
-    datapath =  (path.datapath+'/webpagefortwitter/Tweet_RAW/News/halfbro/*.txt')
-    wordCounts = sc.textFile(datapath).flatMap(lambda doc: parse_tweets(getHtmlfromJson(doc)))#.flatMap(lambda tweet: parse_tweets(tweet))#.reduceByKey(lambda v1,v2:v1 +v2)
+    d='munich'
+    datapath =  (path.datapath+'/webpagefortwitter/Tweet_RAW/News/munich/*.txt')
+    wordCounts = sc.textFile(datapath).flatMap(lambda doc: parse_tweets(getHtmlfromJson(doc))).map(lambda tweet:(tweet['tweet_id'],tweet)).reduceByKey(lambda v1,v2:selectone(v1 ,v2)).map(lambda tweet:(int(tweet[1]['created_at']),tweet[1]))\
+                .sortByKey(True).map(lambda tweet: tweet[1])
     for tweet in wordCounts.collect():
         with open( path.TweetJSONpath+'news/'+d+'.txt', encoding='utf-8', mode='a') as Seenlist:
             JSON = json.dumps(tweet, ensure_ascii=False)

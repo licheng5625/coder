@@ -14,12 +14,12 @@ from sklearn.neural_network import MLPClassifier
 from scipy import stats
 from sklearn.preprocessing import StandardScaler
 
-with open(path.Featurepath+'featuresRumorsTimeSerior.txt', mode='r') as writer:
+with open(path.Featurepath+'featuresRumorsTimeSerior130.txt', mode='r') as writer:
     for line in writer:
         JSON=json.loads(line)
         listofrumor.append(JSON)
 
-with open(path.Featurepath+'featuresNewsTimeSerior.txt', mode='r') as writer:
+with open(path.Featurepath+'featuresNewsTimeSerior130.txt', mode='r') as writer:
     for line in writer:
         JSON=json.loads(line)
         listofnews.append(JSON)
@@ -27,7 +27,7 @@ with open(path.Featurepath+'featuresNewsTimeSerior.txt', mode='r') as writer:
 
 def random_forest_classifier(train_x, train_y):
     from sklearn.ensemble import RandomForestClassifier
-    model = RandomForestClassifier(n_estimators=150,random_state=1)
+    model = RandomForestClassifier(n_estimators=350,random_state=0,n_jobs=4)
     model.fit(train_x, train_y)
     return model
 
@@ -44,7 +44,7 @@ def MLP_classifier(train_x, train_y):
     return clf
 
 def SVM_classifier(train_x, train_y):
-    clf = svm.SVC(C=1)
+    clf = svm.SVC(C=1,random_state=0)
     clf.fit(train_x, train_y)
     return clf
 featuresIndes=[]
@@ -83,13 +83,17 @@ pickedFeatures=featuresdecription.Allfeaturefull
 times=10
 lenofpiece=int(len(indeslixt)/times+0.5)
 allresult=[{} for x in range(49)]
+sortedTime=[]
 for maxtime in range(1,49):
-    # if maxtime%3!=0:
-    #     continue
+    if maxtime not in [1,6,12,18,24,30,36,42,48]:
+        continue
+    sortedTime.append(maxtime)
     result={}
-    for feature in featuresdecription.featureTypes.keys():
+    for feature in featuresdecription.featureTypes2.keys():
+    # for feature in []:
+
     # 1---48 hors
-        aimfeature=featuresdecription.featureTypes[feature]
+        aimfeature=featuresdecription.featureTypes2[feature]
         scores=[]
         for time in range(times):
             listofPara=list()
@@ -118,10 +122,10 @@ for maxtime in range(1,49):
             listofPara = scaler.transform(listofPara)
             listofParatest = scaler.transform(listofParatest)
 
-            # clf = SVM_classifier(listofPara, listofresult)
+            clf = SVM_classifier(listofPara, listofresult)
             #clf=MLP_classifier(listofPara, listofresult)
 
-            clf=random_forest_classifier(listofPara, listofresult)
+            # clf=random_forest_classifier(listofPara, listofresult)
             score = metrics.accuracy_score(clf.predict(listofParatest), (listofresulttest))
             scores.append(score)
         avg=sum(scores) / float(len(scores))
@@ -135,11 +139,11 @@ for maxtime in range(1,49):
         #i+=1
         #print('\''+key+'\'',)
 
-with open(path.Featurepath+"rankedfeatures5.csv",encoding='utf-8', mode='w') as csvfile:
-    writermix = csv.DictWriter(csvfile, fieldnames=['time']+list(featuresdecription.featureTypes.keys()))
+with open(path.Featurepath+"rankedfeaturesgroup_newset_SVM.csv",encoding='utf-8', mode='w') as csvfile:
+    writermix = csv.DictWriter(csvfile, fieldnames=['time']+list(featuresdecription.featureTypes2.keys()))
     writermix.writeheader()
-
-    for time in range(1,49):
+    sortedTime.sort()
+    for time in sortedTime:
         rankedfeature=allresult[time]
         rankedfeature['time']=time
         writermix.writerow(rankedfeature)

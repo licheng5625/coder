@@ -46,6 +46,12 @@ sc = SparkContext(conf=conf)
 
 def sortBytweet(a):
     return a[1]
+creditURL={}
+with open(  path.Featurepath+"tweetRNN30002.txt",encoding="utf-8", mode='r') as Seenlist:
+    for sentence in Seenlist:
+        #URLdict[sentence.split('   ')[0]]=int(sentence.split('   ')[1].replace('\n',''))
+        creditURL=json.loads(sentence)
+
 
 URLdict=dict()
 with open(  path.TweetJSONpath+"WOtURLs.txt",encoding="utf-8", mode='r') as Seenlist:
@@ -122,7 +128,13 @@ class TwitterDescribtor:
 
 
 def getTimefromJson(jsontext):
-    t = datetime.datetime.fromtimestamp((json.loads(jsontext)['created_at']/1000))
+    try:
+        t = datetime.datetime.fromtimestamp((json.loads(jsontext)['created_at']/1000))
+    except:
+        timetext=json.loads(jsontext)['created_at']
+        timetext=timetext.replace(' 24:',' 23:')
+        t = datetime.datetime.strptime(timetext,'%a %b %d %H:%M:%S +0000 %Y')
+
     fmt="%Y-%m-%d-%H"
     return  t#.strftime(fmt)
 
@@ -229,7 +241,7 @@ def containDebunkWords(V):
 def getrepitationScore(following,follower):
     if follower is 0:
         return 0
-    return float(following)/follower
+    return float(following)/(follower+following)
 
 
 def addfrombefore(datalist):
@@ -273,13 +285,29 @@ def getUserFromID(id):
     except KeyError:
         user['user_id']=int(id)
         return user
+extendulrlist={}
+with open(path.TweetJSONpath+'URLsRumors.txt',mode='r') as reader:
+    for line in reader:
+        urls=json.loads(line)
+        extendulrlist[urls[0]]=urls[1]
+with open(path.TweetJSONpath+'URLsNews.txt',mode='r') as reader:
+    for line in reader:
+        urls=json.loads(line)
+        extendulrlist[urls[0]]=urls[1]
 
-# datafolder=path.TweetJSONpath+'news/'
-# descriptionFile=path.TweetJSONpath+'descriptionNews.txt'
-# outputFile=path.Featurepath+'featuresNewsNumphoto.txt'
+def getextendUrl(urllist):
+    if len(urllist)==0:
+        return []
+    ret=[]
+    for url in urllist:
+        ret.append(extendulrlist[url])
+    return ret
+datafolder=path.TweetJSONpath+'news/'
+descriptionFile=path.TweetJSONpath+'descriptionNews.txt'
+outputFile=path.Featurepath+'featuresNewsNumphoto.txt'
 # datafolder=path.TweetJSONpath+'rumors/'
 # descriptionFile=path.TweetJSONpath+'descriptionRumors.txt'
-# outputFile=path.Featurepath+'featuresrumorsNumphoto.txt'
+# outputFile=path.Featurepath+'featuresrumorsnewset.txt'
 
 timeformate='%I:%M %p - %d %b %Y'
 timetoday=datetime.datetime.strptime("10 7 2016",'%d %m %Y')
@@ -287,12 +315,18 @@ list_dirs = os.walk(datafolder)
 for root, dirs, files in list_dirs:
     for file in files:
         if ('.txt'in file):#and title.replace(' ','_') in file):
+            if 'munich' not in file:
+                continue
             title=file.replace('_',' ').replace('.txt','')
+            mytweet=None
             with open(descriptionFile,encoding='utf-8', mode='r')as Seenlist2:
                 for line in Seenlist2:
+                    print(line)
                     data=json.loads(line)
                     if data['tweetsQueryInGoogle'] ==title:
                         mytweet=data
+            if mytweet==None:
+                continue
             print(title)
             datapath=root+file
             rootmap =sc.textFile(datapath)
@@ -330,44 +364,54 @@ for root, dirs, files in list_dirs:
             #print(type(timetoday))
             #TweetNum=map3.filter(lambda v1:v1[0]>=begindate).filter(lambda v1:v1[0]<=enddate).map(lambda v1:(getHours(begindate,v1[0]),v1[1])).reduceByKey(lambda v1,v2:v1+v2).map(lambda v1:[v1[0],v1[1]]).sortByKey(True,1).collect()
             maplenthofTweet=rootJSONMap.map(lambda v1:({'tweetid':v1[1]['tweet_id'],'features':{
-                                                        # 'lenthofTweet':len(v1[1]['text']),
-                                                        # 'PositiveScoer':sid.polarity_scores(v1[1]["text"])['compound'],
-                                                        # 'NumPositiveWords':len(getPositiveWords(v1[1]["text"])),
-                                                        # 'NumNegativeWords':len(getNegativeWords(v1[1]["text"])),
-                                                        # 'numUrls':len(v1[1]["urls"]),
+                                                        'lenthofTweet':len(v1[1]['text']),
+                                                        'PositiveScoer':sid.polarity_scores(v1[1]["text"])['compound'],
+                                                        'NumPositiveWords':len(getPositiveWords(v1[1]["text"])),
+                                                        'NumNegativeWords':len(getNegativeWords(v1[1]["text"])),
+                                                        'numUrls':len(v1[1]["urls"]),
                                                         # 'WotScore':getWOT(v1[1]["extend_urls"]),
+                                                        #
                                                         # 'ContainNEWS':getUrlNews(v1[1]["extend_urls"]),
                                                         # 'UrlRank':getUrlRank(v1[1]["extend_urls"]),
-                                                        #  'UrlRankIn5000':getUrlRankIn5000(v1[1]["extend_urls"]),
-                                                        # 'Favorites':v1[1]['favorites'],
-                                                        # 'Hashtag':len(v1[1]['hashtags']),
-                                                        # 'Isretweet':tranto01(v1[1]['isretweet']),
-                                                        # 'Retweets':v1[1]['retweets'],#10
-                                                        # 'Contain_videos':tranto01(v1[1]['contain_videos']),
-                                                        # 'Stock':containStock(v1[1]['text']),
-                                                        # 'NumChar':getNumChars(v1[1]['text']),
-                                                        # 'Capital':PersentofCapital(v1[1]['text']),
-                                                        # 'Via':containVia(v1[1]['text']),
-                                                        # 'I':containI(v1[1]['text']),
-                                                        # 'Smile':containSmile(v1[1]['text']),
-                                                        # 'Sad':containSad(v1[1]['text']),
-                                                        # 'HeShe':containHeShe(v1[1]['text']),
-                                                        # 'You':containU(v1[1]['text']),#20
-                                                        # 'Menstion':len(v1[1]['menstion']),
-                                                        # 'Question':containQuestion(v1[1]['text']),
-                                                        # 'Exclamation':containexclamation(v1[1]['text']),
-                                                        # 'QuestionExclamation':tranto01(containQuestion(v1[1]['text'])>1 or containexclamation(v1[1]['text'])>1),
-                                                        # 'UserDescription':tranto01(len(getUserFromID(v1[1]["user_id"])['Description'])>0),
-                                                        # 'Userverified':tranto01(getUserFromID(v1[1]["user_id"])['verified']),
-                                                        # 'Userfollowers_count':getUserFromID(v1[1]["user_id"])['followers_count'],
-                                                        # 'Userfriends_count':getUserFromID(v1[1]["user_id"])['friends_count'],
-                                                        # 'Usertweets_count':getUserFromID(v1[1]["user_id"])['tweets_count'],
-                                                        # 'UserrepitationScore':getrepitationScore(float(getUserFromID(v1[1]["user_id"])['followers_count']),getUserFromID(v1[1]["user_id"])['friends_count']),
-                                                        # 'UserJoin_date':(timetoday-datetime.datetime.strptime(getUserFromID(v1[1]["user_id"])['Join_date'],timeformate)).days ,
-                                                        # 'NumPhotos':v1[1]['contain_photos_number'],#32
-                                                        # 'UserNumphoto':getUserFromID(v1[1]["user_id"])['photos_count'],
-                                                        # 'UserIsInLargeCity':tranto01(getUserFromID(v1[1]["user_id"])['location'] in mapUsersLargeCitySet),
-                                                        'debunkingWords':containDebunkWords(v1[1]['text'])},
+                                                        # 'UrlRankIn5000':getUrlRankIn5000(v1[1]["extend_urls"]),
+
+                                                        'WotScore':getWOT(getextendUrl(v1[1]["urls"])),
+
+                                                        'ContainNEWS':getUrlNews(getextendUrl(v1[1]["urls"])),
+                                                        'UrlRank':getUrlRank(getextendUrl(v1[1]["urls"])),
+                                                        'UrlRankIn5000':getUrlRankIn5000(getextendUrl(v1[1]["urls"])),
+
+                                                        'Favorites':v1[1]['favorites'],
+                                                        'Hashtag':len(v1[1]['hashtags']),
+                                                        'Isretweet':tranto01(v1[1]['isretweet']),
+                                                        'Retweets':v1[1]['retweets'],#10
+                                                        'Contain_videos':tranto01(v1[1]['contain_videos']),
+                                                        'Stock':containStock(v1[1]['text']),
+                                                        'NumChar':getNumChars(v1[1]['text']),
+                                                        'Capital':PersentofCapital(v1[1]['text']),
+                                                        'Via':containVia(v1[1]['text']),
+                                                        'I':containI(v1[1]['text']),
+                                                        'Smile':containSmile(v1[1]['text']),
+                                                        'Sad':containSad(v1[1]['text']),
+                                                        'HeShe':containHeShe(v1[1]['text']),
+                                                        'You':containU(v1[1]['text']),#20
+                                                        'Menstion':len(v1[1]['menstion']),
+                                                        'Question':containQuestion(v1[1]['text']),
+                                                        'Exclamation':containexclamation(v1[1]['text']),
+                                                        'QuestionExclamation':tranto01(containQuestion(v1[1]['text'])>1 or containexclamation(v1[1]['text'])>1),
+                                                        'UserDescription':tranto01(len(getUserFromID(v1[1]["user_id"])['Description'])>0),
+                                                        'Userverified':tranto01(getUserFromID(v1[1]["user_id"])['verified']),
+                                                        'Userfollowers_count':getUserFromID(v1[1]["user_id"])['followers_count'],
+                                                        'Userfriends_count':getUserFromID(v1[1]["user_id"])['friends_count'],
+                                                        'Usertweets_count':getUserFromID(v1[1]["user_id"])['tweets_count'],
+                                                        'UserrepitationScore':getrepitationScore(float(getUserFromID(v1[1]["user_id"])['followers_count']),getUserFromID(v1[1]["user_id"])['friends_count']),
+                                                        'UserJoin_date':(timetoday-datetime.datetime.strptime(getUserFromID(v1[1]["user_id"])['Join_date'],timeformate)).days ,
+                                                        'NumPhotos':v1[1]['contain_photos_number'],#32
+                                                        'UserNumphoto':getUserFromID(v1[1]["user_id"])['photos_count'],
+                                                        'UserIsInLargeCity':tranto01(getUserFromID(v1[1]["user_id"])['location'] in mapUsersLargeCitySet),
+                                                        'DebunkingWords':containDebunkWords(v1[1]['text']),
+                                                        'creditScore':creditURL[str(v1[1]['tweet_id'])]
+                                                        },
                                                         'time':getHours(begindate,v1[0])}
 
                                             )).collect()

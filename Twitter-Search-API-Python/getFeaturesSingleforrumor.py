@@ -247,14 +247,14 @@ except FileNotFoundError:
 
 timeformate='%I:%M %p - %d %b %Y'
 timetoday=datetime.datetime.strptime("10 7 2016",'%d %m %Y')
-list_dirs = os.walk(path.datapath+'/webpagefortwitter/Tweet_JSON/news/')
+list_dirs = os.walk(path.datapath+'/webpagefortwitter/Tweet_JSON/rumors/')
 for root, dirs, files in list_dirs:
     for file in files:
         if ('.txt'in file):#and title.replace(' ','_') in file):
             title=file.replace('_',' ').replace('.txt','')
             if (title in checklist):
                 continue
-            with open(path.TweetJSONpath+'descriptionNews.txt', mode='r')as Seenlist2:
+            with open(path.TweetJSONpath+'descriptionnewrumor.txt', mode='r')as Seenlist2:
                 for line in Seenlist2:
                     data=json.loads(line)
                     if data['tweetsQueryInGoogle'] ==title:

@@ -7,7 +7,7 @@ from abc import abstractmethod
 from urllib.parse import urlunparse
 from bs4 import BeautifulSoup
 from time import sleep
-import path
+import mypath as path
 import random
 import os
 from fake_useragent import UserAgent
@@ -53,7 +53,12 @@ class TwitterSearch(metaclass=ABCMeta):
             max_tweet = tweets[-1]
             self.save_webpage(response)
             if min_tweet['tweet_id'] is not max_tweet['tweet_id']:
-                max_position = "TWEET-%s-%s" % (max_tweet['tweet_id'], min_tweet['tweet_id'])
+                if min_tweet['tweet_id'] == '795340873328304128':
+                    max_position = "TWEET-%s-%s" % (756942417199259649, 756942455228866560)
+                else :
+                    max_position = "TWEET-%s-%s" % (max_tweet['tweet_id'], min_tweet['tweet_id'])
+
+                print(max_position)
                 url = self.construct_url(query, max_position=max_position)
                 # Sleep for our rate_delay
                 sleep(self.rate_delay)
@@ -238,6 +243,8 @@ if __name__ == '__main__':
     with open(  path.datapath+"NewsLIST.txt",encoding="utf-8", mode='r') as Seenlist:
         for sentence in Seenlist:
             checkedtitle=sentence.split("@,@")[1].replace('\n','')
+            if 'munich' not in checkedtitle:
+                continue
             if(checkedtitle not in checkedlist):
                 twit = TwitterSearchImpl(checkedtitle,1, 5, 1500000)
                 twit.search(sentence.split("@,@")[0])

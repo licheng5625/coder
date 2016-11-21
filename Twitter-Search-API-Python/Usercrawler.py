@@ -43,7 +43,7 @@ class UserCrawler:
                    with open(path.userrawpath +'canfindhard.txt', encoding='utf-8', mode='a') as Seenlist:
                        Seenlist.write(username+'\n')
 
-            self.__saveWebpage(path.userrawpath+'News/',username+'.html',decompressed_data.decode('utf-8'))
+            self.__saveWebpage(path.userrawpath+'Rumors/',username+'.html',decompressed_data.decode('utf-8'))
             with open(path.userrawpath +'pagesavedlist.txt', encoding='utf-8', mode='a') as Seenlist:
                 Seenlist.write(username+'\n')
         except urllib.error.HTTPError:
@@ -64,7 +64,7 @@ class UserCrawler:
         #fff=soup.find_all("a","img-wrapper")
     def CrawPages(self):
          self._getHeader()
-         with open(path.USerJSONpath+'simple_News_UserJson.txt', encoding='utf-8', mode='r') as Seenlist:
+         with open(path.USerJSONpath+'simple_Rumor_UserJson.txt', encoding='utf-8', mode='r') as Seenlist:
             for line in Seenlist:
                 self.listoflink.add(json.loads(line)['screen_name'])
          for link in self.listoflink:

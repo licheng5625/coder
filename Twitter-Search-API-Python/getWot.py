@@ -1,6 +1,6 @@
 import urllib.request, urllib.error, urllib.parse
 import json
-import path
+import mypath as path
 from fake_useragent import UserAgent
 from bs4 import BeautifulSoup
 import time
@@ -37,13 +37,10 @@ def getWotScore(url):
 
 UlrWot=dict()
 listofproxy=[]
-with open(path.datapath+'proxylist.txt',mode='r') as pro:
-    for line in pro:
-        listofproxy.append(json.loads(line.replace("\n",'')))
 
-with open(path.Featurepath+'URLsRumors.txt', mode='r')as Seenlist2:
+with open(path.TweetJSONpath+'URLsNews.txt', mode='r')as Seenlist2:
      for line in Seenlist2:
-         line=line.replace("\n",'')
+         line=json.loads(line.replace("\n",''))[1]
          UlrWot[line]=0
 
 # with open(path.datapath+'/webpagefortwitter/Tweet_JSON/'+'URLs.txt', mode='r')as Seenlist2:
@@ -60,16 +57,26 @@ with open(path.Featurepath+'URLsRumors.txt', mode='r')as Seenlist2:
 #          line=line.replace("\n",'').split("   ")
 #          UlrWot[line[0]]=line[1]
 
-outfile=path.Featurepath+'WOtURLs2.txt'
+outfile=path.TweetJSONpath+'WOtURLs2.txt'
 
 listofweb=[]
-with open(outfile, mode='r')as Seenlist2:
+try:
+    with open(outfile, mode='r')as Seenlist2:
+        for line in Seenlist2:
+            print(line)
+            url=json.loads(line)['url']
+            listofweb.append(url)
+except FileNotFoundError:
+    pass
+
+with open(path.TweetJSONpath+'WOtURLs.txt', mode='r')as Seenlist2:
     for line in Seenlist2:
         url=json.loads(line)['url']
         listofweb.append(url)
-
-
-
+with open(path.TweetJSONpath+'WOtURLs2.txt', mode='r')as Seenlist2:
+    for line in Seenlist2:
+        url=json.loads(line)['url']
+        listofweb.append(url)
 
 
 
@@ -129,6 +136,9 @@ def getNum(numstring):
     return int(tempstr)
 def phaseAlexa(html):
     css_soup = BeautifulSoup(html)
+    if css_soup.find('h1')!=None and  css_soup.find('h1').text=='Forbidden':
+       return 'error'
+
     try:
         #css_soup.select(".align-vmiddle")
         rank= css_soup.select(".change-r2")[0].parent.strong.text.replace('\n','')
@@ -182,6 +192,7 @@ def inputcaptcha(url):
     #
     # element = bowser.find_element_by_xpath('//*[contains(concat( " ", @class, " " ), concat( " ", "bluecoat_logo", " " ))]')#//*[contains(concat( " ", @class, " " ), concat( " ", "captcha", " " ))]')
     #
+    # time.sleep(20)
     bowser.save_screenshot('screenshot.png') # saves screenshot of entire page
     #
     im = Image.open('screenshot.png') # uses PIL library to open image in memory
@@ -204,6 +215,7 @@ def phaseTypes(url,html):
             inputcaptcha(url)
             return 'error'
         else:
+            print(url)
             sys.exit()
     try:
         if not html['unrated']:
@@ -266,6 +278,12 @@ def getProxy():
 # css_soup = BeautifulSoup(html2)
 # css_soup=css_soup.select(".captcha")[0].get('src')
 # print(css_soup)
+UlrWotold={}
+# with open(path.TweetJSONpath+'WOtURLsOLD.txt', mode='r')as Seenlist2:
+#      for line in Seenlist2:
+#          line=json.loads(line)
+#          UlrWotold[line['url']]=line
+
 sss='www.kairalinewsonline.comreal-or-fake-photo-of-worlds-darkest-baby-goes-viral'
 with open(outfile, mode='a')as Seenlist2:
         wotdict=dict()
@@ -275,37 +293,58 @@ with open(outfile, mode='a')as Seenlist2:
         count=0
         for key in UlrWot.keys():
             count+=1
-            if key not in listofweb:
-                if key=='' or key=='\n' or len(key)>70 or key=='California.http:' or len(key)<5:
+            if key not in listofweb :
+                if key=='turkey':
                     continue
-                print(str( count)+"--------"+str(len(UlrWot)))
-                wotdict['type']=getTypenoproxy(key)
-                while wotdict['type']=='error':
-                    wotdict['type']=getTypenoproxy(key)
+                if key=='' or key=='\n' or len(key)>70 or key=='California.http:' or len(key)<5 or 'www.businessi' in key or 'khilafah.com'in key or 'inlocalneworleans' in key or 'comnews' in key:
+                    continue
+                if 'tumblr' not in key:
 
-                    # blacklistproxy.add(proxies['http'])
-                    # proxies=None
-                    # while proxies==None:
-                    #     proxies=getProxy()
-                    # wotdict['type']=getType(key,proxies)
-                wotdict['rank']=getRanknoproxy(key)#,proxies)
-                while wotdict['rank']=='error':
-                    # if proxies!=None:
-                    #     blacklistproxy.add(proxies['http'])
-                    # proxies=None
-                    # while proxies==None:
-                    #     proxies=getProxy()
-                    wotdict['rank']=getRanknoproxy(key)
-                    #wotdict['rank']=getRank(key,proxies)
-                wotdict['url']=key
-                if UlrWot[key]!=0:
-                    Json = json.loads(getWotScore(key+'/'))
-                    try:
-                        wotdict['wot']=Json[key]['0'][0]
-                    except KeyError:
-                        wotdict['wot']=0
+                    print(str( count)+"--------"+str(len(UlrWot)))
+                    if key not in UlrWotold.keys():
+                        wotdict['type']=getTypenoproxy(key)
+                        while wotdict['type']=='error':
+                            wotdict['type']=getTypenoproxy(key)
+                    else:
+                        wotdict['type']=UlrWotold[key]['type']
+                        # blacklistproxy.add(proxies['http'])
+                        # proxies=None
+                        # while proxies==None:
+                        #     proxies=getProxy()
+                        # wotdict['type']=getType(key,proxies)
+                    if key  in UlrWotold.keys() and UlrWotold[key]['rank']!=20000000:
+                        wotdict['rank']=UlrWotold[key]['rank']#,proxies)
+                    else:
+                        wotdict['rank']=getRanknoproxy(key)#,proxies)
+                        if wotdict['rank']=='error':
+                            print('get rank error')
+                            break
+                    #while wotdict['rank']=='error':
+                        # if proxies!=None:
+                        #     blacklistproxy.add(proxies['http'])
+                        # proxies=None
+                        # while proxies==None:
+                        #     proxies=getProxy()
+                        #wotdict['rank']=getRanknoproxy(key)
+                        #wotdict['rank']=getRank(key,proxies)
+                    wotdict['url']=key
+                    #if UlrWot[key]!=0:
+                    if key in UlrWotold.keys() and UlrWotold[key]['wot']!=0:
+                        wotdict['wot']=UlrWotold[key]['wot']
+                    else:
+                        Json = json.loads(getWotScore(key+'/'))
+                        print(Json)
+                        try:
+                            wotdict['wot']=Json[key]['0'][0]
+                        except KeyError:
+                            wotdict['wot']=0
+                    # else:
+                    #         wotdict['wot']=0
                 else:
-                        wotdict['wot']=0
+                    wotdict['wot']=0
+                    wotdict['rank']=20000000
+                    wotdict['type']='no type'
+                    wotdict['url']=key
                 listofweb.append(key)
                 Seenlist2.write(json.dumps(wotdict)+"\n")
 

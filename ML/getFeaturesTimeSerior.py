@@ -2,6 +2,7 @@ import os
 
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
 from urllib.parse import urlparse
+import simpleSEIZ_fit
 
 sid = SentimentIntensityAnalyzer()
 os.environ['LC_ALL'] = 'en_US.UTF-8'
@@ -24,15 +25,33 @@ def addfrombefore(datalist):
 
 datafolder=path.TweetJSONpath+'news/'
 descriptionFile=path.TweetJSONpath+'descriptionNews.txt'
-outputFile=path.Featurepath+'featuresNewsTimeSeriorSIR.txt'
-Singlefeautrefile=path.Featurepath+'featuresNews.txt'
+outputFile=path.Featurepath+'featuresNewsTimeSeriorMunich.txt'
+Singlefeautrefile=path.Featurepath+'featuresNewsNumphoto.txt'
 
 
-#
+# #
 # datafolder=path.TweetJSONpath+'rumors/'
 # descriptionFile=path.TweetJSONpath+'descriptionRumors.txt'
-# outputFile=path.Featurepath+'featuresRumorsTimeSeriorSIR.txt'
+# outputFile=path.Featurepath+'featuresRumorsTimeSeriorTwe.txt'
 # Singlefeautrefile=path.Featurepath+'featuresRumors.txt'
+
+eventdict={}
+craledevent=set()
+
+try:
+    with open(outputFile,encoding='utf-8', mode='r') as reader:
+        for line in reader:
+            JSON=json.loads(line)
+            craledevent.add(JSON['eventID'])
+except Exception:
+    pass
+with open(Singlefeautrefile,encoding='utf-8', mode='r') as reader:
+    for line in reader:
+        JSON=json.loads(line)
+        eventdict[JSON['eventID']]=JSON['data']
+
+
+
 
 isrumor=0
 eventdict={}
@@ -42,10 +61,10 @@ with open(Singlefeautrefile, mode='r') as reader:
         JSON=json.loads(line)
         eventdict[JSON['eventID']]=JSON['data']
 
-try:
-    os.remove(outputFile)
-except Exception:
-    pass
+# try:
+#     os.remove(outputFile)
+# except Exception:
+#     pass
 
 totallnum=[]
 timeformate='%I:%M %p - %d %b %Y'
@@ -54,13 +73,25 @@ list_dirs = os.walk(datafolder)
 for root, dirs, files in list_dirs:
     for file in files:
         if ('.txt'in file):#and title.replace(' ','_') in file):
+            if 'mun' not in file:
+                continue
             title=file.replace('_',' ').replace('.txt','')
+            mytweet=None
             with open(descriptionFile,encoding='utf-8', mode='r')as Seenlist2:
                 for line in Seenlist2:
                     data=json.loads(line)
                     if data['tweetsQueryInGoogle'] ==title:
                         mytweet=data
-            print(title)
+
+            if mytweet==None:
+                continue
+            eventID=mytweet['eventID']
+
+            if eventID in craledevent:
+                continue
+
+            print(file)
+            # print(mytweet['eventID'])
             eventID=mytweet['eventID']
             event=eventdict[eventID]
             outputfeature={'eventID':eventID,'isrumor':isrumor}
@@ -108,6 +139,7 @@ for root, dirs, files in list_dirs:
                 QuestionExclamation=0        #21
                 Sad=0                    #22
                 Usertweets_count=0             #23
+                Usertweets_count_perDay=0             #23
                 UserrepitationScore=0       #24
                 Userverified=0            #25
                 Menstion=0              #26
@@ -125,16 +157,23 @@ for root, dirs, files in list_dirs:
                 UrlRankIn5000=0
                 features={}
                 outputfeature['features']["F"+str(i)]=features
-                features['beta'],features['gamma']=simpleSIR_fit.fitSIS(volumetotal[:i])[2:]
-                #features['Pp'],features['Pa'],features['Ps'],features['Qa'],features['Qp'],features['Qs']=LMtext.fittoSpikeM(volumeperHour[:i])
-                #for tweet in tweetlist[i]:
+                # features['beta'],features['gamma']=simpleSIR_fit.fitSIS(volumetotal[:i])[:2]
+                # features['B'],features['b'],features['l'],features['e'],features['p'],features['rho']=simpleSEIZ_fit.fitSEIZ(volumetotal[:i])[:6]
+                # features['SEIZIndex']=((1-features['p'])*features['B']+(1-features['l'])*features['b'])/(features['rho']+features['e'])
+
+                #
+                # features['Pp'],features['Pa'],features['Ps'],features['Qp'],features['Qa'],features['Qs']=LMtext.fittoSpikeM(volumeperHour[:i])
+                for tweet in tweetlist[i]:
+                    # print(tweet)
+                    # print(tweet['tweetid'])
+
                     # Userfollowers_count+=tweet['Userfollowers_count']
                     # PositiveScoer+=tweet['PositiveScoer']
                     # Smile+=tweet['Smile']
                     # UserJoin_date+=tweet['UserJoin_date']
                     # NumPositiveWords+=tweet['NumPositiveWords']
                     # You+=tweet['You']
-                    # numUrls+=tweet['numUrls']
+                    numUrls+=tweet['numUrls']
                     # NumNegativeWords+=tweet['NumNegativeWords']
                     # UserDescription+=tweet['UserDescription']
                     # Retweets+=tweet['Retweets']
@@ -151,40 +190,41 @@ for root, dirs, files in list_dirs:
                     # Question+=tweet['Question']
                     # QuestionExclamation+=tweet['QuestionExclamation']
                     # Sad+=tweet['Sad']
+                    # # Usertweets_count_perDay+=tweet['UserTweetsPerDays']
                     # Usertweets_count+=tweet['Usertweets_count']
                     # UserrepitationScore+=tweet['UserrepitationScore']
                     # Userverified+=tweet['Userverified']
                     # Menstion+=tweet['Menstion']
                     # UrlRank+=tweet['UrlRank']
-                    #UrlRankIn5000+=tweet['UrlRankIn5000']
+                    UrlRankIn5000+=tweet['UrlRankIn5000']
                     # Userfriends_count+=tweet['Userfriends_count']
                     # NumPhotos+=tweet['NumPhotos']
                     # NumChar+=tweet['NumChar']
                     # Via+=tweet['Via']
                     # Favorites+=tweet['Favorites']
                     # lenthofTweet+=tweet['lenthofTweet']
-                    # ContainNEWS+=tweet['ContainNEWS']
+                    ContainNEWS+=tweet['ContainNEWS']
                     # Isretweet+=tweet['Isretweet']
-                    # creditScore+=tweet['creditScore']
-                    #DebunkingWords+=tweet['DebunkingWords']
+                    creditScore+=int(tweet['creditScore'])
+                    # DebunkingWords+=tweet['debunkingWords']
 
-
+                # features['UserTweetsPerDays']=Usertweets_count_perDay/float(volume)
                 # features['Userfollowers_count']=Userfollowers_count/float(volume)
                 # features['PositiveScoer']=PositiveScoer/float(volume)
                 # features['Smile']=Smile/float(volume)
                 # features['UserJoin_date']=UserJoin_date/float(volume)
                 # features['NumPositiveWords']=NumPositiveWords/float(volume)
                 # features['You']=You/float(volume)
-                #features['UrlRankIn5000']=UrlRankIn5000/float(volume)
-                #features['DebunkingWords']=DebunkingWords/float(volume)
-                # if numUrls!=0:
+                features['UrlRankIn5000']=UrlRankIn5000/float(volume)
+                # features['DebunkingWords']=DebunkingWords/float(volume)
+                if numUrls!=0:
                 #     features['WotScore']=WotScore/float(numUrls)
                 #     features['UrlRank']=UrlRank/float(numUrls)
-                #     features['ContainNEWS']=ContainNEWS/float(numUrls)
-                # else:
+                    features['ContainNEWS']=ContainNEWS/float(numUrls)
+                else:
                 #     features['WotScore']=0
                 #     features['UrlRank']=0
-                #     features['ContainNEWS']=0
+                    features['ContainNEWS']=0
                 # features['numUrls']=numUrls/float(volume)
                 # features['NumNegativeWords']=NumNegativeWords/float(volume)
                 # features['UserDescription']=UserDescription/float(volume)
@@ -200,6 +240,7 @@ for root, dirs, files in list_dirs:
                 # features['Exclamation']=Exclamation/float(volume)
                 # features['QuestionExclamation']=QuestionExclamation/float(volume)
                 # features['Usertweets_count']=Usertweets_count/float(volume)
+                #
                 # features['UserrepitationScore']=UserrepitationScore/float(volume)
                 # features['Userverified']=Userverified/float(volume)
                 # features['Menstion']=Menstion/float(volume)
@@ -212,12 +253,12 @@ for root, dirs, files in list_dirs:
                 # features['Isretweet']=Isretweet/float(volume)
                 # features['Sad']=Sad/float(volume)
                 # features['Question']=Question/float(volume)
-                # features['creditScore']=creditScore/float(volume)
-                if (i!=0):
-                    features={}
-                    outputfeature['features']["S"+str(i)]=features
-                    for feature in outputfeature['features']["F"+str(i)].keys():
-                        features[feature]=outputfeature['features']["F"+str(i)][feature]-outputfeature['features']["F"+str(i-1)][feature]
+                features['creditScore']=creditScore/float(volume)
+                # if (i!=0):
+                #     features={}
+                #     outputfeature['features']["S"+str(i)]=features
+                #     for feature in outputfeature['features']["F"+str(i)].keys():
+                #         features[feature]=outputfeature['features']["F"+str(i)][feature]-outputfeature['features']["F"+str(i-1)][feature]
 
                 #print (str(volume)+'    '+str(sumLength)+' accuracy: %.2f' % (sumLength/float(volume)))
 

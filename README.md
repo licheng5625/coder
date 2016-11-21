@@ -18,25 +18,27 @@ ML : get fearutre from tweet and train the ML models.
 
     TimeSerierModel.py  : time series model
     TimeSerierModelStatic.py  : static model
-featuresdecription.py   : features list  
-TimeSerierModel_groupfeature.py    : time series model tested by groups features
-TimeSerierModel_featureSelection.py   :  features selection
-TimeSerierModel_everyfeature_importance.py  :  rank features
-mergeFeatureTimeserior.py : merge features 
-mergeFeature.py : merge features 
-KeraCNNLstm.py : single tweet model
-KeraLSTM.py : single tweet model
-KeraGRU.py : single tweet model
-KeraBasicRNN.py : single tweet model
-KeraCNN.py : single tweet model
-RNN.py : single tweet model
-fasttxt.py : single tweet model
+    featuresdecription.py   : features list  
+    TimeSerierModel_groupfeature.py    : time series model tested by groups features
+    TimeSerierModel_featureSelection.py   :  features selection
+    TimeSerierModel_everyfeature_importance.py  :  rank features
+    mergeFeatureTimeserior.py : merge features 
+    mergeFeature.py : merge features 
 
-spikeMfit.py : model fitting
-GraphSIR_fit.py : model fitting
-simpleSEIZ_fit.py : model fitting
-simpleSIR_fit.py : model fitting
-LMtext.py : model fitting
-simpleSIR.py : model fitting
 
-mypath.py
+    KeraCNNLstm.py : single tweet model
+    KeraLSTM.py : single tweet model
+    KeraGRU.py : single tweet model
+    KeraBasicRNN.py : single tweet model
+    KeraCNN.py : single tweet model
+    RNN.py : single tweet model
+    fasttxt.py : single tweet model
+
+    spikeMfit.py : model fitting
+    GraphSIR_fit.py : model fitting
+    simpleSEIZ_fit.py : model fitting
+    simpleSIR_fit.py : model fitting
+    LMtext.py : model fitting
+    simpleSIR.py : model fitting
+
+    mypath.py

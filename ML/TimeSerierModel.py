@@ -110,8 +110,8 @@ times=10
 lenofpiece=int(len(indeslixt)/times+0.5)
 
 for maxtime in range(1,49):
-    if maxtime not in [1,6,12,18,24,30,36,42,48]:
-        continue
+    # if maxtime not in [1,6,12,18,24,30,36,42,48]:
+    #     continue
     scores=[]
     # if maxtime%6!=0 and maxtime!=1:
     #     continue

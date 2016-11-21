@@ -274,15 +274,15 @@ def getUserFromID(id):
         user['user_id']=int(id)
         return user
 
-datafolder=path.TweetJSONpath+'news/'
-descriptionFile=path.TweetJSONpath+'descriptionNews.txt'
-outputFile=path.Featurepath+'featuresNewsNumphoto.txt'
-outputFilereadble=path.Featurepath+'featuresNewsreadble.txt'
+# datafolder=path.TweetJSONpath+'news/'
+# descriptionFile=path.TweetJSONpath+'descriptionNews.txt'
+# outputFile=path.Featurepath+'featuresNewsNumphoto.txt'
+# outputFilereadble=path.Featurepath+'featuresNewsreadble.txt'
 
-# datafolder=path.TweetJSONpath+'rumors/'
-# descriptionFile=path.TweetJSONpath+'descriptionRumors.txt'
-# outputFile=path.Featurepath+'featuresrumorsNumphoto.txt'
-# outputFilereadble=path.Featurepath+'ffeaturesrumorsNumphotoreadble.txt'
+datafolder=path.TweetJSONpath+'rumors/'
+descriptionFile=path.TweetJSONpath+'descriptionRumors.txt'
+outputFile=path.Featurepath+'featuresrumorsNumphoto.txt'
+outputFilereadble=path.Featurepath+'ffeaturesrumorsNumphotoreadble.txt'
 
 timeformate='%I:%M %p - %d %b %Y'
 timetoday=datetime.datetime.strptime("10 7 2016",'%d %m %Y')
@@ -329,7 +329,7 @@ for root, dirs, files in list_dirs:
             maplargeCity=sc.parallelize(largecitylist)
             mapUsersLargeCity=rootJSONMap.map(lambda v1:( getUserFromID(v1[1]["user_id"])['location'],1)).filter(lambda v:(v[0]!='')).reduceByKey(lambda v1,v2:v1+v2).map(lambda v1:v1[0])#.sortByKey(True,1).collect()
             mapUsersLargeCitySet=mapUsersLargeCity.cartesian(maplargeCity).filter(lambda v1:(v1[0] is not None and v1[1] in v1[0])).map(lambda v:v[0]).collect()
-            maplenthofTweet=rootJSONMap.filter(lambda v1:((containDebunkWords(v1[1]['text'])==1 and  getUserFromID(v1[1]["user_id"])['verified'])or (getUrlRank(v1[1]["extend_urls"])<1000 and getUrlNews(v1[1]["extend_urls"])==1)))
+            maplenthofTweet=rootJSONMap.filter(lambda v1:((containDebunkWords(v1[1]['text'])==1 and  getUserFromID(v1[1]["user_id"])['verified'])or (  getUrlNews(v1[1]["extend_urls"])==1)))
             #print(type(timetoday))
             #TweetNum=map3.filter(lambda v1:v1[0]>=begindate).filter(lambda v1:v1[0]<=enddate).map(lambda v1:(getHours(begindate,v1[0]),v1[1])).reduceByKey(lambda v1,v2:v1+v2).map(lambda v1:[v1[0],v1[1]]).sortByKey(True,1).collect()
             maplenthofTweet=maplenthofTweet.map(lambda v1:({'tweetid':v1[1]['tweet_id'],'features':{

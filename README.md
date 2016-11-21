@@ -1,5 +1,6 @@
 # coder
 Twitter-Search-API-Python	: code about crawl in tweet
+
     Usercrawler.py      : for crawling information of users
     TwitterScraper.py  :for crawling information of users
     getWot.py  : for crawling rank type WOT of URLs  ## im = im.crop((80, 800, 480, 900)) this line should be modified basing on your own machine;  requier Chromie Browser =<54.0.2840.98
@@ -11,6 +12,7 @@ snopesCrawler	: crwal in snopes
 
 
 ML : get fearutre from tweet and train the ML models.
+
     getFeaturesSingleJs on.py  : get feauters of single tweet
     getFeaturesTimeSerior.py  : get tempral features
 
